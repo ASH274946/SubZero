@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">SubZero</string>
+    <string name="accessibility_service_description">SubZero detects deceptive subscription paywall terms locally on your device without transmitting any data over the internet.</string>
+    <string name="notification_service_description">SubZero securely monitors UPI AutoPay and e-mandate registration notices locally to calculate recurring liabilities.</string>
+
+    <!-- Overlay Warning Strings (English Default) -->
+    <string name="warning_title_en">SUBSCRIPTION WARNING</string>
+    <string name="warning_headline_en">Deceptive Subscription Terms Detected</string>
+    <string name="warning_detail_en">This screen contains recurring billing or automatic renewal terms disguised as a trial.</string>
+    
+    <!-- Overlay Warning Strings (Telugu) -->
+    <string name="warning_title_te">చందా హెచ్చరిక</string>
+    <string name="warning_headline_te">మోసపూరిత సబ్‌స్క్రిప్షన్ నిబంధనలు గుర్తించబడ్డాయి</string>
+    <string name="warning_detail_te">ఈ స్క్రీన్‌లో ట్రయల్ పేరుతో ఆటోమేటిక్ పునరుద్ధరణ లేదా రికరింగ్ బిల్లింగ్ నిబంధనలు ఉన్నాయి.</string>
+
+    <!-- Overlay Warning Strings (Hindi) -->
+    <string name="warning_title_hi">सदस्यता चेतावनी</string>
+    <string name="warning_headline_hi">भ्रामक सदस्यता शर्तें पाई गईं</string>
+    <string name="warning_detail_hi">इस स्क्रीन में मुफ़्त ट्रायल के आड़ में ऑटो-रिन्यूअल या बार-बार बिलिंग की शर्तें हैं।</string>
+
+    <string name="risk_score_label">Risk Score: %1$d/100</string>
+    <string name="dismiss_label">Dismiss</string>
+</resources>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="52dp"
+    android:background="@drawable/overlay_warning_background"
+    android:orientation="vertical"
+    android:elevation="12dp">
+
+    <!-- Header: Title & Risk Score Badge -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/overlay_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/warning_title_en"
+            android:textColor="#FDA4AF"
+            android:textStyle="bold"
+            android:textSize="13sp"
+            android:letterSpacing="0.04" />
+
+        <TextView
+            android:id="@+id/overlay_risk_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Risk Score: 88/100"
+            android:textColor="#FDA4AF"
+            android:textStyle="bold"
+            android:textSize="11sp"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="3dp"
+            android:background="#26FB7185" />
+    </LinearLayout>
+
+    <!-- Subtle Specular Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="#26FFFFFF" />
+
+    <!-- Headline -->
+    <TextView
+        android:id="@+id/overlay_headline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="This trial is not free"
+        android:textColor="@color/text_primary"
+        android:textStyle="bold"
+        android:textSize="16sp" />
+
+    <!-- Details -->
+    <TextView
+        android:id="@+id/overlay_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="This app will automatically deduct ₹899 every month starting in 3 days."
+        android:textColor="@color/text_secondary"
+        android:textSize="13sp"
+        android:lineSpacingExtra="2dp" />
+
+</LinearLayout>

@@ -1,0 +1,26 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- White Circle Background -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,2 C36.15,2 46,11.85 46,24 C46,36.15 36.15,46 24,46 C11.85,46 2,36.15 2,24 C2,11.85 11.85,2 24,2 Z" />
+    <!-- Blue Loop -->
+    <path
+        android:fillColor="#4285F4"
+        android:pathData="M21,14 C17.13,14 14,17.13 14,21 L14,26 C14,28.21 15.79,30 18,30 C20.21,30 22,28.21 22,26 L22,21 C22,20.45 22.45,20 23,20 C23.55,20 24,20.45 24,21 L24,27 C24,30.87 20.87,34 17,34 C13.13,34 10,30.87 10,27 L10,21 C10,14.92 14.92,10 21,10 L25,10 L25,14 Z" />
+    <!-- Yellow Loop -->
+    <path
+        android:fillColor="#FBBC04"
+        android:pathData="M27,34 C30.87,34 34,30.87 34,27 L34,22 C34,19.79 32.21,18 30,18 C27.79,18 26,19.79 26,22 L26,27 C26,27.55 25.55,28 25,28 C24.45,28 24,27.55 24,27 L24,21 C24,17.13 27.13,14 31,14 C34.87,14 38,17.13 38,21 L38,27 C38,33.08 33.08,38 27,38 L23,38 L23,34 Z" />
+    <!-- Green Accent -->
+    <path
+        android:fillColor="#34A853"
+        android:pathData="M22,26 C22,28.21 20.21,30 18,30 C16.5,30 15.2,29.1 14.5,27.9 C15.5,29.2 17.1,30 19,30 C21.21,30 23,28.21 23,26 L23,20.5 C22.4,20.2 22,20.8 22,21.5 Z" />
+    <!-- Red Accent -->
+    <path
+        android:fillColor="#EA4335"
+        android:pathData="M26,22 C26,19.79 27.79,18 30,18 C31.5,18 32.8,18.9 33.5,20.1 C32.5,18.8 30.9,18 29,18 C26.79,18 25,19.79 25,22 L25,27.5 C25.6,27.8 26,27.2 26,26.5 Z" />
+</vector>

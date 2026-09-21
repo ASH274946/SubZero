@@ -1,0 +1,17 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- PhonePe Purple Background Circle -->
+    <path
+        android:fillColor="#5F259F"
+        android:pathData="M24,2 C36.15,2 46,11.85 46,24 C46,36.15 36.15,46 24,46 C11.85,46 2,36.15 2,24 C2,11.85 11.85,2 24,2 Z" />
+    <!-- White Pe / पे Symbol -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M29.5,13 L18,13 C16.9,13 16,13.9 16,15 L16,34 C16,35.1 16.9,36 18,36 C19.1,36 20,35.1 20,34 L20,28 L27,28 C31.42,28 35,24.42 35,20 C35,15.58 31.42,13 27,13 Z M27,24 L20,24 L20,17 L27,17 C28.66,17 30,18.34 30,20 C30,21.66 28.66,24 27,24 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M21,28 L29,36 L34,36 L25,27 Z" />
+</vector>

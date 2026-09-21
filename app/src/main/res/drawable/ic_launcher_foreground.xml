@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Shield Outline with Neon Red Accent -->
+    <path
+        android:strokeColor="#FF2A54"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#1A202C"
+        android:pathData="M54,24 L30,34 L30,54 C30,70 40,82 54,88 C68,82 78,70 78,54 L78,34 Z" />
+    <!-- SubZero Ice Snowflake/Zero Core -->
+    <path
+        android:fillColor="#00E676"
+        android:pathData="M54,40 L58,48 L66,48 L60,54 L62,62 L54,58 L46,62 L48,54 L42,48 L50,48 Z" />
+</vector>
