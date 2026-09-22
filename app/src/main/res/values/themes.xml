@@ -4,5 +4,7 @@
         <item name="android:statusBarColor">@color/surface_dark</item>
         <item name="android:navigationBarColor">@color/surface_dark</item>
         <item name="android:windowBackground">@color/surface_dark</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/subzero_logo</item>
+        <item name="android:windowSplashScreenBackground">@color/surface_dark</item>
     </style>
 </resources>

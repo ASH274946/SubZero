@@ -4,9 +4,12 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.ui.res.painterResource
+import com.subzero.R
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -95,22 +98,30 @@ fun HomeScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column {
-                        Text(
-                            text = "SubZero",
-                            fontSize = 28.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = M3TextPrimary,
-                            fontFamily = GoogleSansFamily,
-                            letterSpacing = (-0.5).sp
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(id = R.drawable.subzero_logo),
+                            contentDescription = "SubZero Logo",
+                            modifier = Modifier.size(42.dp)
                         )
-                        Text(
-                            text = "Daily Synced • On-Device Guardian",
-                            fontSize = 12.sp,
-                            color = M3TextSecondary,
-                            fontFamily = GoogleSansFamily,
-                            fontWeight = FontWeight.Medium
-                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column {
+                            Text(
+                                text = "SubZero",
+                                fontSize = 26.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = M3TextPrimary,
+                                fontFamily = GoogleSansFamily,
+                                letterSpacing = (-0.5).sp
+                            )
+                            Text(
+                                text = "Daily Synced • On-Device Guardian",
+                                fontSize = 11.sp,
+                                color = M3TextSecondary,
+                                fontFamily = GoogleSansFamily,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
                     }
 
                     Surface(
@@ -131,13 +142,13 @@ fun HomeScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.PlayArrow,
-                                contentDescription = "Walkthrough",
+                                contentDescription = "Demo",
                                 tint = M3PinePrimary,
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = "Walkthrough",
+                                text = "Demo",
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = M3PinePrimary,

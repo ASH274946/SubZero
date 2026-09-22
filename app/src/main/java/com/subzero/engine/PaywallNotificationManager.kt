@@ -56,8 +56,11 @@ object PaywallNotificationManager {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val logoBitmap = android.graphics.BitmapFactory.decodeResource(context.resources, com.subzero.R.drawable.subzero_logo)
+
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_alert)
+            .setLargeIcon(logoBitmap)
             .setContentTitle("⚠️ Hidden Recurring Charge in $appName")
             .setContentText("This trial auto-renews at $amount. Tap to review.")
             .setStyle(

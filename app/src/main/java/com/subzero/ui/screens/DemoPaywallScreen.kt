@@ -22,14 +22,52 @@ import com.subzero.engine.PaywallNotificationManager
 import com.subzero.ui.components.bouncyClickable
 import com.subzero.ui.theme.*
 
+import androidx.compose.foundation.clickable
+import androidx.compose.runtime.*
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.subzero.data.BlockedTrapEntity
+import com.subzero.data.SubZeroDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+enum class DemoAlertLanguage {
+    ENGLISH, TELUGU, HINDI
+}
+
 @Composable
 fun DemoPaywallScreen(
     onDismiss: () -> Unit = {},
     onNavigateBack: () -> Unit = onDismiss
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var showWarningPopup by remember { mutableStateOf(false) }
+
     val handleDismiss = {
         onNavigateBack()
+    }
+
+    if (showWarningPopup) {
+        DemoWarningPopup(
+            onDismiss = { showWarningPopup = false },
+            onBlockAndExit = {
+                scope.launch(Dispatchers.IO) {
+                    try {
+                        SubZeroDatabase.getInstance(context).mandateDao().recordBlockedTrap(
+                            BlockedTrapEntity(
+                                packageName = "com.docuscan.fake",
+                                trapType = "Deceptive 3-Day Trial AutoPay",
+                                detectedText = "Start 3-Day Free Trial - Renews at ₹899/month",
+                                riskScore = 92
+                            )
+                        )
+                    } catch (_: Exception) {}
+                }
+                showWarningPopup = false
+                handleDismiss()
+            }
+        )
     }
 
     Scaffold(
@@ -153,6 +191,7 @@ fun DemoPaywallScreen(
                     .fillMaxWidth()
                     .height(56.dp)
                     .bouncyClickable {
+                        showWarningPopup = true
                         PaywallNotificationManager.postDarkPatternAlert(
                             context = context,
                             appName = "DocuScan Pro",
@@ -235,3 +274,257 @@ fun FeatureItem(
         }
     }
 }
+
+@Composable
+fun DemoWarningPopup(
+    onDismiss: () -> Unit,
+    onBlockAndExit: () -> Unit
+) {
+    var selectedLanguage by remember { mutableStateOf(DemoAlertLanguage.ENGLISH) }
+
+    val headlineText = when (selectedLanguage) {
+        DemoAlertLanguage.ENGLISH -> "This Free Trial is Not Free"
+        DemoAlertLanguage.TELUGU -> "ఈ ఉచిత ట్రయల్ పూర్తిగా ఉచితం కాదు"
+        DemoAlertLanguage.HINDI -> "यह ट्रायल मुफ़्त नहीं है"
+    }
+
+    val bodyText = when (selectedLanguage) {
+        DemoAlertLanguage.ENGLISH -> "DocuScan Pro will automatically deduct ₹899 every month starting in 3 days via UPI AutoPay."
+        DemoAlertLanguage.TELUGU -> "ఈ యాప్ 3 రోజుల తర్వాత ప్రతి నెలా మీ బ్యాంక్ నుండి ₹899 ఆటో-డెబిట్ చేస్తుంది."
+        DemoAlertLanguage.HINDI -> "यह ऐप 3 दिनों के बाद हर महीने आपके बैंक खाते से ₹899 ऑटोपे के ज़रिए काट लेगा।"
+    }
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0x66000000))
+                .padding(horizontal = 20.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Surface(
+                shape = RoundedCornerShape(26.dp),
+                color = M3SurfaceWhite,
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFDCE6E0)),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(22.dp)
+                ) {
+                    // Header: Warning Badge + Risk Tag
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Surface(
+                            shape = RoundedCornerShape(percent = 50),
+                            color = M3AlertCoralContainer
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Warning,
+                                    contentDescription = null,
+                                    tint = M3AlertCoral,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "Dark Pattern Detected",
+                                    color = M3AlertCoral,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = GoogleSansFamily
+                                )
+                            }
+                        }
+
+                        Text(
+                            text = "RISK 92%",
+                            color = M3AlertCoral,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontFamily = GoogleSansFamily,
+                            letterSpacing = 1.sp
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    Text(
+                        text = headlineText,
+                        color = M3TextPrimary,
+                        fontSize = 19.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = GoogleSansFamily
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Text(
+                        text = bodyText,
+                        color = M3TextSecondary,
+                        fontSize = 13.sp,
+                        fontFamily = GoogleSansFamily,
+                        lineHeight = 18.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Language Selector Chips
+                    Surface(
+                        shape = RoundedCornerShape(percent = 50),
+                        color = M3CanvasBackground,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(38.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(3.dp)
+                        ) {
+                            DemoLanguageChip(
+                                label = "English",
+                                isSelected = selectedLanguage == DemoAlertLanguage.ENGLISH,
+                                onClick = { selectedLanguage = DemoAlertLanguage.ENGLISH },
+                                modifier = Modifier.weight(1f)
+                            )
+                            DemoLanguageChip(
+                                label = "తెలుగు",
+                                isSelected = selectedLanguage == DemoAlertLanguage.TELUGU,
+                                onClick = { selectedLanguage = DemoAlertLanguage.TELUGU },
+                                modifier = Modifier.weight(1f)
+                            )
+                            DemoLanguageChip(
+                                label = "हिंदी",
+                                isSelected = selectedLanguage == DemoAlertLanguage.HINDI,
+                                onClick = { selectedLanguage = DemoAlertLanguage.HINDI },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Breakdown Box
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
+                        color = M3CanvasBackground,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(14.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text("Target App", fontSize = 12.sp, color = M3TextSecondary, fontFamily = GoogleSansFamily)
+                                Text("DocuScan Pro", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = M3TextPrimary, fontFamily = GoogleSansFamily)
+                            }
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text("Hidden AutoPay", fontSize = 12.sp, color = M3TextSecondary, fontFamily = GoogleSansFamily)
+                                Text("₹899.00 / month", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = M3AlertCoral, fontFamily = GoogleSansFamily)
+                            }
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text("Auto-Deduction", fontSize = 12.sp, color = M3TextSecondary, fontFamily = GoogleSansFamily)
+                                Text("After 72 Hours", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = M3TextPrimary, fontFamily = GoogleSansFamily)
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // Action Buttons
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Surface(
+                            shape = RoundedCornerShape(percent = 50),
+                            color = M3AlertCoral,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp)
+                                .bouncyClickable { onBlockAndExit() }
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    text = "Block AutoPay",
+                                    color = Color.White,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = GoogleSansFamily
+                                )
+                            }
+                        }
+
+                        Surface(
+                            shape = RoundedCornerShape(percent = 50),
+                            color = M3CanvasBackground,
+                            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFDCE6E0)),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp)
+                                .bouncyClickable { onDismiss() }
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    text = "Dismiss",
+                                    color = M3TextPrimary,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = GoogleSansFamily
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DemoLanguageChip(
+    label: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        shape = RoundedCornerShape(percent = 50),
+        color = if (isSelected) M3SurfaceWhite else Color.Transparent,
+        modifier = modifier
+            .fillMaxHeight()
+            .clickable { onClick() }
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Text(
+                text = label,
+                color = if (isSelected) M3PinePrimary else M3TextSecondary,
+                fontSize = 12.sp,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                fontFamily = GoogleSansFamily
+            )
+        }
+    }
+}
+

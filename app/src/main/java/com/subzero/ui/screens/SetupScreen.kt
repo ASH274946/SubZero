@@ -10,9 +10,12 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.res.painterResource
+import com.subzero.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -112,6 +115,14 @@ fun SetupScreen(
         ) {
             Spacer(modifier = Modifier.height(48.dp))
 
+            Image(
+                painter = painterResource(id = R.drawable.subzero_logo),
+                contentDescription = "SubZero Logo",
+                modifier = Modifier.size(64.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             // Brand Pill Badge
             Box(
                 modifier = Modifier
@@ -128,13 +139,6 @@ fun SetupScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Shield,
-                        contentDescription = null,
-                        tint = LiquidGlassTokens.PastelPeriwinkle,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "SubZero • On-Device Defense",
                         color = LiquidGlassTokens.PastelPeriwinkle,
