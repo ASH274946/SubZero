@@ -18,8 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.subzero.engine.PaywallNotificationManager
 import com.subzero.ui.components.bouncyClickable
-import com.subzero.ui.overlays.WarningOverlay
 import com.subzero.ui.theme.*
 
 @Composable
@@ -148,12 +148,17 @@ fun DemoPaywallScreen(
             Surface(
                 shape = RoundedCornerShape(percent = 50),
                 color = M3PinePrimary,
-                shadowElevation = 4.dp,
+                border = androidx.compose.foundation.BorderStroke(1.dp, M3PinePrimary),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
                     .bouncyClickable {
-                        WarningOverlay.show(context)
+                        PaywallNotificationManager.postDarkPatternAlert(
+                            context = context,
+                            appName = "DocuScan Pro",
+                            amount = "₹899/mo",
+                            renewalDetails = "Charges apply automatically after the 3-day trial period expires."
+                        )
                     }
             ) {
                 Row(

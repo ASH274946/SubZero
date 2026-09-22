@@ -26,4 +26,19 @@ data class BlockedTrapEntity(
 
     @ColumnInfo(name = "timestamp")
     val timestamp: Long = System.currentTimeMillis()
-)
+) {
+    @androidx.room.Ignore
+    constructor(
+        targetAppPackage: String,
+        detectedHeadline: String,
+        trapType: String = "Trial Trap",
+        riskScore: Int = 90
+    ) : this(
+        id = 0,
+        packageName = targetAppPackage,
+        trapType = trapType,
+        detectedText = detectedHeadline,
+        riskScore = riskScore,
+        timestamp = System.currentTimeMillis()
+    )
+}

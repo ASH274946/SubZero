@@ -30,6 +30,9 @@ open class SubZeroApp : Application() {
         super.onCreate()
         instance = this
 
+        // Register the high-priority system notification channel
+        com.subzero.engine.PaywallNotificationManager.createNotificationChannel(this)
+
         // Register persistent daily morning sync (06:00 AM)
         DailyAutoPaySyncWorker.scheduleDailySync(this)
 
