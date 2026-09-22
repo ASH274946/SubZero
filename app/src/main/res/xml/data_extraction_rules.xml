@@ -2,9 +2,9 @@
 <data-extraction-rules>
     <cloud-backup>
         <!-- Disallow any cloud backup of local mandate records -->
-        <exclude path="." />
+        <exclude domain="root" path="." />
     </cloud-backup>
     <device-transfer>
-        <exclude path="." />
+        <exclude domain="root" path="." />
     </device-transfer>
 </data-extraction-rules>

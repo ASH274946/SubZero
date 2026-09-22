@@ -21,6 +21,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -91,7 +92,10 @@ fun Modifier.bounceClick(
     if (!enabled) return this
 
     return this
-        .scale(scale)
+        .graphicsLayer {
+            scaleX = scale
+            scaleY = scale
+        }
         .pointerInput(enabled) {
             awaitEachGesture {
                 awaitFirstDown(requireUnconsumed = false)

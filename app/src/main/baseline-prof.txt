@@ -1,0 +1,39 @@
+# SubZero 120Hz Baseline Profile - Ahead-Of-Time (AOT) Compilation Rules
+# Eliminates cold-start jank, first-scroll stutter, and runtime bytecode interpretation.
+
+# Core SubZero UI Screens & Hot Rendering Paths
+Lcom/subzero/ui/screens/HomeScreenKt;
+HSPLcom/subzero/ui/screens/HomeScreenKt;->HomeScreen(Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Landroidx/compose/runtime/Composer;II)V
+HSPLcom/subzero/ui/screens/HomeScreenKt;->DetailedM3MandateCard(Lcom/subzero/data/MandateEntity;Lkotlin/jvm/functions/Function0;Landroidx/compose/runtime/Composer;I)V
+HSPLcom/subzero/ui/screens/HomeScreenKt;->AlignedMetricTile(Ljava/lang/String;Ljava/lang/String;Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;II)V
+HSPLcom/subzero/ui/screens/HomeScreenKt;->ToggleRowItem(Landroidx/compose/ui/graphics/vector/ImageVector;Ljava/lang/String;Ljava/lang/String;ZLkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;I)V
+
+# 120Hz Zero-Recomposition Touch Modifiers
+Lcom/subzero/ui/components/HapticModifiersKt;
+HSPLcom/subzero/ui/components/HapticModifiersKt;->bouncyClickable(Landroidx/compose/ui/Modifier;ZFLkotlin/jvm/functions/Function0;Landroidx/compose/runtime/Composer;II)Landroidx/compose/ui/Modifier;
+Lcom/subzero/guardian/ui/components/ComponentBridgesKt;
+HSPLcom/subzero/guardian/ui/components/ComponentBridgesKt;->bouncyClickable(Landroidx/compose/ui/Modifier;ZFLkotlin/jvm/functions/Function0;Landroidx/compose/runtime/Composer;II)Landroidx/compose/ui/Modifier;
+
+# UI Components & Themes
+Lcom/subzero/ui/components/M3TactileSwitchKt;
+Lcom/subzero/ui/components/UpiAppIconKt;
+Lcom/subzero/ui/components/UpiAppSyncRowKt;
+Lcom/subzero/ui/theme/ColorKt;
+Lcom/subzero/ui/theme/ThemeKt;
+Lcom/subzero/ui/theme/TypeKt;
+Lcom/subzero/ui/theme/LiquidGlassModifiersKt;
+
+# Data Models & Room DAOs
+Lcom/subzero/data/MandateEntity;
+Lcom/subzero/data/MandateDao;
+Lcom/subzero/data/SubZeroDatabase;
+
+# Jetpack Compose Fast Paths (Lazy Lists, Graphics Layer, Layout, Gestures)
+Landroidx/compose/foundation/lazy/LazyListKt;
+Landroidx/compose/foundation/lazy/LazyListState;
+Landroidx/compose/ui/graphics/GraphicsLayerModifierKt;
+Landroidx/compose/ui/graphics/layer/GraphicsLayer;
+Landroidx/compose/animation/core/Animatable;
+Landroidx/compose/animation/core/AnimateAsStateKt;
+Landroidx/compose/foundation/gestures/TapGestureDetectorKt;
+Landroidx/lifecycle/compose/FlowExtKt;

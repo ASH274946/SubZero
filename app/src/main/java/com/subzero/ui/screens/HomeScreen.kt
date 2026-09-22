@@ -17,8 +17,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -50,10 +52,10 @@ fun HomeScreen(
     val database = remember { SubZeroDatabase.getInstance(context) }
     val mandateDao = database.mandateDao()
 
-    val activeMandates by mandateDao.getActiveMandates().collectAsState(initial = emptyList())
-    val activeCount by mandateDao.getActiveMandateCount().collectAsState(initial = 0)
-    val totalDrain by mandateDao.getTotalMonthlyDrain().collectAsState(initial = 0.0)
-    val blockedTrapsCount by mandateDao.getBlockedTrapsCount().collectAsState(initial = 0)
+    val activeMandates by mandateDao.getActiveMandates().collectAsStateWithLifecycle(initialValue = emptyList())
+    val activeCount by mandateDao.getActiveMandateCount().collectAsStateWithLifecycle(initialValue = 0)
+    val totalDrain by mandateDao.getTotalMonthlyDrain().collectAsStateWithLifecycle(initialValue = 0.0)
+    val blockedTrapsCount by mandateDao.getBlockedTrapsCount().collectAsStateWithLifecycle(initialValue = 0)
 
     val installedUpiApps = remember { InstalledUpiDetector.getInstalledUpiApps(context) }
     var syncingAppPackage by remember { mutableStateOf<String?>(null) }
@@ -114,7 +116,7 @@ fun HomeScreen(
                     Surface(
                         shape = RoundedCornerShape(50),
                         color = M3SurfaceWhite,
-                        shadowElevation = 2.dp,
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFDCE6E0)),
                         modifier = Modifier
                             .height(42.dp)
                             .bouncyClickable {
@@ -361,7 +363,10 @@ fun HomeScreen(
                     }
                 }
             } else {
-                items(activeMandates, key = { it.umn }) { mandate ->
+                items(
+                    items = activeMandates, 
+                    key = { mandate -> mandate.umn } // Stable, unique identifier
+                ) { mandate ->
                     DetailedM3MandateCard(
                         mandate = mandate,
                         onStopClick = {
@@ -400,7 +405,8 @@ fun DetailedM3MandateCard(
     Surface(
         shape = RoundedCornerShape(22.dp),
         color = M3SurfaceWhite,
-        shadowElevation = 1.dp,
+        // OPTIMIZATION: Removed heavy shadow elevation. Use a subtle 1dp border instead for 120Hz smoothness.
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFDCE6E0)),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -560,7 +566,7 @@ fun AlignedMetricTile(
     Surface(
         shape = RoundedCornerShape(22.dp),
         color = M3SurfaceWhite,
-        shadowElevation = 1.dp,
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFDCE6E0)),
         modifier = modifier
     ) {
         Column(
