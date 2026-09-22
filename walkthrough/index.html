@@ -1,0 +1,1997 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SubZero — Autonomous On-Device UPI AutoPay Guardian</title>
+  <meta name="description" content="Interactive Product Walkthrough of SubZero: On-Device UPI AutoPay Guardian on flagship iQOO hardware simulation.">
+  
+  <!-- Google Sans / Plus Jakarta Sans & Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            m3: {
+              canvas: '#EAF2ED',
+              white: '#FFFFFF',
+              variant: '#DCE6E0',
+              pine: '#1E5144',
+              pineDark: '#143B31',
+              pineContainer: '#CBE7DD',
+              textPrimary: '#19231E',
+              textSecondary: '#5A6F66',
+              textTertiary: '#8A9E96',
+              badgeMint: '#D7EFE4',
+              alertCoral: '#D9534F',
+              alertCoralContainer: '#FDE8E7'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', '"Google Sans"', 'Roboto', 'sans-serif'],
+            display: ['"Space Grotesk"', '"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Viewport lock: prevent outer scrolling completely on standard displays */
+    html, body {
+      height: 100%;
+      max-height: 100vh;
+      overflow: hidden;
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    @media (max-height: 700px) {
+      html, body {
+        overflow-y: auto;
+      }
+    }
+
+    /* Subtle scrollbar for inside phone and transcript */
+    ::-webkit-scrollbar {
+      width: 3.5px;
+      height: 3.5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(30, 81, 68, 0.25);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(30, 81, 68, 0.45);
+    }
+
+    .scrollbar-none::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-none {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Background pattern */
+    .bg-subzero-mesh {
+      background-color: #090E0C;
+      background-image: 
+        radial-gradient(at 15% 15%, rgba(30, 81, 68, 0.25) 0px, transparent 65%),
+        radial-gradient(at 85% 85%, rgba(203, 231, 221, 0.08) 0px, transparent 65%),
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+    }
+
+    /* Flagship iQOO Frame sized to fit viewport perfectly */
+    .iqoo-phone-frame {
+      width: 342px;
+      height: min(710px, calc(100vh - 45px));
+      border-radius: 40px;
+      position: relative;
+      background: #0D1110;
+      padding: 8px;
+      box-shadow: 
+        0 0 0 1.5px #2A3834,
+        0 0 0 3.5px #0A0D0C,
+        0 20px 50px -15px rgba(20, 59, 49, 0.5),
+        0 10px 30px -10px rgba(0, 0, 0, 0.85),
+        inset 0 0 0 1.5px rgba(255, 255, 255, 0.18);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      flex-shrink: 0;
+    }
+
+    /* Side Keys */
+    .iqoo-phone-frame::before {
+      content: '';
+      position: absolute;
+      right: -4.5px;
+      top: 155px;
+      width: 3.5px;
+      height: 75px;
+      background: linear-gradient(to bottom, #2E3B37, #1E2825);
+      border-radius: 0 3px 3px 0;
+    }
+    .iqoo-phone-frame::after {
+      content: '';
+      position: absolute;
+      right: -4.5px;
+      top: 250px;
+      width: 3.5px;
+      height: 44px;
+      background: linear-gradient(to bottom, #FF8C00, #FF5500);
+      border-radius: 0 3px 3px 0;
+      box-shadow: 1px 0 4px rgba(255, 122, 0, 0.6);
+    }
+
+    /* Phone screen viewport */
+    .iqoo-screen-viewport {
+      width: 100%;
+      height: 100%;
+      border-radius: 32px;
+      overflow: hidden;
+      position: relative;
+      background: #EAF2ED;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Simulated button active press effect */
+    .simulated-active-press {
+      transform: scale(0.95) !important;
+      filter: brightness(0.92);
+      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Tactile wave ripple */
+    .touch-ripple {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 95;
+      transform: translate(-50%, -50%) scale(0);
+      animation: ripple-wave 0.6s cubic-bezier(0.1, 0.7, 0.3, 1) forwards;
+      background: radial-gradient(circle, rgba(30, 81, 68, 0.4) 0%, rgba(203, 231, 221, 0.15) 70%, transparent 100%);
+    }
+
+    @keyframes ripple-wave {
+      0% {
+        width: 14px;
+        height: 14px;
+        opacity: 0.9;
+        transform: translate(-50%, -50%) scale(0.2);
+      }
+      100% {
+        width: 80px;
+        height: 80px;
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.6);
+      }
+    }
+
+    /* Soundwave animation */
+    .soundwave-bar {
+      width: 2.5px;
+      border-radius: 9999px;
+      background: #CBE7DD;
+      animation: soundwave-bounce 0.75s ease-in-out infinite alternate;
+    }
+    @keyframes soundwave-bounce {
+      0% { height: 4px; }
+      100% { height: 18px; }
+    }
+    .soundwave-bar:nth-child(2) { animation-delay: 0.12s; }
+    .soundwave-bar:nth-child(3) { animation-delay: 0.3s; }
+    .soundwave-bar:nth-child(4) { animation-delay: 0.22s; }
+    .soundwave-bar:nth-child(5) { animation-delay: 0.4s; }
+
+    /* Focus pulse glow */
+    .pulse-glow-pine {
+      animation: pine-glow 1.5s ease-in-out infinite alternate;
+    }
+    @keyframes pine-glow {
+      0% { box-shadow: 0 0 0 0 rgba(30, 81, 68, 0.45); }
+      100% { box-shadow: 0 0 0 6px rgba(30, 81, 68, 0); }
+    }
+
+    .pulse-glow-coral {
+      animation: coral-glow 1.3s ease-in-out infinite alternate;
+    }
+    @keyframes coral-glow {
+      0% { box-shadow: 0 0 0 0 rgba(217, 83, 79, 0.55); }
+      100% { box-shadow: 0 0 0 8px rgba(217, 83, 79, 0); }
+    }
+
+    /* Screen visibility transitions */
+    .app-screen {
+      transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .app-screen.hidden-screen {
+      display: none !important;
+    }
+    .app-screen.visible-screen {
+      display: block;
+      animation: screenFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    #screen-paywall.app-screen.visible-screen {
+      display: flex !important;
+    }
+    @keyframes screenFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.985) translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    /* Dialog / Bottom Sheets */
+    .m3-dialog-backdrop {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .m3-dialog-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .m3-dialog-card {
+      transform: scale(0.92) translateY(12px);
+      transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .m3-dialog-backdrop.open .m3-dialog-card {
+      transform: scale(1) translateY(0);
+    }
+
+    .m3-bottom-sheet {
+      transform: translateY(105%);
+      pointer-events: none;
+      transition: transform 0.36s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .m3-dialog-backdrop.open .m3-bottom-sheet,
+    .m3-bottom-sheet.open {
+      transform: translateY(0%);
+      pointer-events: auto;
+    }
+
+    /* Android Heads-up banner */
+    .heads-up-notif {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(calc(-100% - 60px));
+      transition: transform 0.42s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.25s ease;
+    }
+    .heads-up-notif.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0%);
+    }
+
+    /* Tactile M3 Switch thumb spring */
+    .m3-switch-thumb {
+      transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.18s ease;
+    }
+  </style>
+</head>
+
+<body class="bg-subzero-mesh text-slate-100 font-sans antialiased selection:bg-m3-pine selection:text-white flex flex-col justify-center">
+  
+  <!-- Outer Application Wrapper: Fits in 100vh with no outer scroll -->
+  <div class="h-screen max-h-screen flex flex-col justify-center px-4 sm:px-8 lg:px-12 py-3 max-w-[1520px] mx-auto w-full">
+
+    <!-- Split Screen Presentation Grid -->
+    <main class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center my-auto">
+      
+      <!-- ================= LEFT PANEL: STORY & CONTROLS ================= -->
+      <section class="lg:col-span-6 flex flex-col justify-center space-y-4 max-w-xl">
+
+        <!-- Headline & Tagline -->
+        <div>
+          <h1 class="font-sans text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
+            Autonomous <span class="text-transparent bg-clip-text bg-gradient-to-r from-m3-pineContainer via-emerald-300 to-teal-200">AutoPay Defense</span>
+          </h1>
+          <p class="mt-2 text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Intercepts dark patterns, audits fragmented UPI mandates across PhonePe, Google Pay & Paytm, and shuts down deceptive recurring drain before bank debit.
+          </p>
+        </div>
+
+        <!-- TOUR CONTROLLER CARD -->
+        <div class="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/15 backdrop-blur-xl shadow-xl space-y-3">
+          
+          <!-- Master Walkthrough Launch Button -->
+          <button id="btn-master-walkthrough" class="w-full relative group overflow-hidden rounded-xl p-[1.5px] focus:outline-none shadow-lg transition-all duration-200 transform active:scale-[0.99]">
+            <div class="absolute inset-0 bg-gradient-to-r from-emerald-600 via-m3-pine to-emerald-700 rounded-xl"></div>
+            <div class="relative px-4 py-2.5 rounded-[10.5px] bg-gradient-to-r from-m3-pineDark to-m3-pine flex items-center justify-between text-white">
+              <div class="flex items-center gap-3 text-left">
+                <div class="w-9 h-9 rounded-lg bg-m3-pineContainer/20 border border-m3-pineContainer/40 flex items-center justify-center text-m3-pineContainer">
+                  <svg id="master-btn-icon" class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                  </svg>
+                </div>
+                <div>
+                  <div class="font-sans font-bold text-sm sm:text-base tracking-tight flex items-center gap-1.5">
+                    <span id="master-btn-title">PROCEED WALKTHROUGH</span>
+                    <span class="px-1.5 py-0.2 text-[9px] font-mono rounded bg-emerald-400/20 text-emerald-300 border border-emerald-400/30">AUTO-PILOT</span>
+                  </div>
+                  <p class="text-[10px] text-slate-300/90 font-medium">Interactive live simulation with synchronized speech</p>
+                </div>
+              </div>
+              <div class="hidden sm:flex items-center gap-1 text-m3-pineContainer font-semibold text-xs">
+                <span>Launch</span>
+                <svg class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </div>
+            </div>
+          </button>
+
+          <!-- Timeline Stepper & Progress -->
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between text-[11px] font-mono">
+              <span class="text-slate-300 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-m3-pineContainer"></span>
+                <span id="label-step-title" class="font-bold text-white">Step 1/7: Intro & Hub</span>
+              </span>
+              <span id="label-step-timer" class="text-slate-400">0s / 58s</span>
+            </div>
+            
+            <div class="w-full h-1.5 rounded-full bg-white/10 overflow-hidden relative" id="timeline-scrubber">
+              <div id="timeline-progress-bar" class="h-full bg-gradient-to-r from-m3-pineContainer via-emerald-400 to-teal-300 rounded-full transition-all duration-300 w-0"></div>
+            </div>
+
+            <!-- Step Chips (Click to jump) -->
+            <div class="grid grid-cols-7 gap-1 pt-1" id="step-chips-container">
+              <button data-step="1" class="step-chip px-0.5 py-1 rounded text-[9.5px] font-mono font-semibold text-center border transition-all bg-white/5 border-white/10 text-slate-400 hover:text-white">1. Hub</button>
+              <button data-step="2" class="step-chip px-0.5 py-1 rounded text-[9.5px] font-mono font-semibold text-center border transition-all bg-white/5 border-white/10 text-slate-400 hover:text-white">2. Trap</button>
+              <button data-step="3" class="step-chip px-0.5 py-1 rounded text-[9.5px] font-mono font-semibold text-center border transition-all bg-white/5 border-white/10 text-slate-400 hover:text-white">3. SLM</button>
+              <button data-step="4" class="step-chip px-0.5 py-1 rounded text-[9.5px] font-mono font-semibold text-center border transition-all bg-white/5 border-white/10 text-slate-400 hover:text-white">4. Apps</button>
+              <button data-step="5" class="step-chip px-0.5 py-1 rounded text-[9.5px] font-mono font-semibold text-center border transition-all bg-white/5 border-white/10 text-slate-400 hover:text-white">5. Hikes</button>
+              <button data-step="6" class="step-chip px-0.5 py-1 rounded text-[9.5px] font-mono font-semibold text-center border transition-all bg-white/5 border-white/10 text-slate-400 hover:text-white">6. Stop</button>
+              <button data-step="7" class="step-chip px-0.5 py-1 rounded text-[9.5px] font-mono font-semibold text-center border transition-all bg-white/5 border-white/10 text-slate-400 hover:text-white">7. Zero</button>
+            </div>
+          </div>
+
+          <!-- Secondary Audio & Playback Toolbar -->
+          <div class="flex items-center justify-between gap-2 pt-1 border-t border-white/10">
+            <div class="flex items-center gap-1.5">
+              <button id="btn-pause-resume" class="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 flex items-center gap-1 transition-colors">
+                <svg id="icon-pause" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>
+                </svg>
+                <span id="text-pause">Pause</span>
+              </button>
+              
+              <button id="btn-restart-walkthrough" class="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 flex items-center gap-1 transition-colors">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                <span>Restart</span>
+              </button>
+            </div>
+
+            <button id="btn-toggle-voice" class="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-m3-pine/30 hover:bg-m3-pine/50 text-m3-pineContainer border border-m3-pine/60 flex items-center gap-1.5 transition-colors">
+              <svg id="icon-volume" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+              </svg>
+              <span id="text-volume">Narration: ON</span>
+            </button>
+          </div>
+
+          <!-- Live Subtitle Box -->
+          <div class="p-2.5 rounded-xl bg-black/40 border border-white/10">
+            <div class="flex items-center justify-between pb-1 mb-1 border-b border-white/5">
+              <div class="flex items-center gap-1.5">
+                <div class="flex items-end gap-0.5 h-3.5" id="soundwave-anim">
+                  <span class="soundwave-bar"></span>
+                  <span class="soundwave-bar"></span>
+                  <span class="soundwave-bar"></span>
+                  <span class="soundwave-bar"></span>
+                </div>
+                <span class="text-[10px] font-mono uppercase tracking-wider text-m3-pineContainer font-semibold">Live Speech Transcript</span>
+              </div>
+              <span id="speaker-badge" class="text-[9px] font-mono px-1 py-0.2 rounded bg-white/5 text-slate-400">Web Speech API</span>
+            </div>
+            
+            <p id="live-caption-text" class="text-xs text-slate-200 leading-snug italic min-h-[32px] flex items-center">
+              "Click 'Proceed Walkthrough' above to initiate the autonomous guided tour, or freely touch and interact with the phone."
+            </p>
+          </div>
+        </div>
+
+        <!-- Architectural Key Specs -->
+        <div class="grid grid-cols-4 gap-2 pt-0.5">
+          <div class="p-2 rounded-xl bg-white/[0.03] border border-white/10">
+            <div class="text-[9px] font-mono text-slate-400">INFERENCE</div>
+            <div class="text-[11px] font-bold text-slate-200 mt-0.5">Local SLM</div>
+          </div>
+          <div class="p-2 rounded-xl bg-white/[0.03] border border-white/10">
+            <div class="text-[9px] font-mono text-slate-400">LATENCY</div>
+            <div class="text-[11px] font-bold text-slate-200 mt-0.5">&lt; 200ms</div>
+          </div>
+          <div class="p-2 rounded-xl bg-white/[0.03] border border-white/10">
+            <div class="text-[9px] font-mono text-slate-400">COMPLIANCE</div>
+            <div class="text-[11px] font-bold text-slate-200 mt-0.5">DPDP 2023</div>
+          </div>
+          <div class="p-2 rounded-xl bg-white/[0.03] border border-white/10">
+            <div class="text-[9px] font-mono text-slate-400">PRIVACY</div>
+            <div class="text-[11px] font-bold text-m3-pineContainer mt-0.5">Zero Cloud</div>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ================= RIGHT PANEL: iQOO FLAGSHIP CANVAS ================= -->
+      <section class="lg:col-span-6 flex justify-center items-center relative">
+        
+        <!-- Ambient lighting -->
+        <div class="absolute w-[360px] h-[640px] bg-gradient-to-tr from-m3-pine/30 via-emerald-600/15 to-transparent rounded-[50px] blur-3xl -z-10"></div>
+
+        <!-- iQOO Hardware Chassis -->
+        <div class="iqoo-phone-frame" id="iqoo-device-chassis">
+
+          <!-- Screen Viewport -->
+          <div class="iqoo-screen-viewport text-m3-textPrimary relative select-none" id="phone-screen-viewport">
+            
+            <!-- ANDROID STATUS BAR (Pixel-perfect iQOO Centered Punch-Hole) -->
+            <div class="relative h-8 px-4 flex items-center justify-between text-[11px] font-semibold z-50 select-none bg-transparent pt-1">
+              
+              <!-- Left: Time + Alert Icon -->
+              <div class="flex items-center gap-1.5 text-m3-textPrimary z-10">
+                <span class="font-bold text-[12px] tracking-tight">9:31:39</span>
+                <svg class="w-3.5 h-3.5 text-emerald-700 ml-0.5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2Z"/>
+                </svg>
+              </div>
+
+              <!-- Center: Physical iQOO Punch Hole Camera (Vertically Centered in Status Bar) -->
+              <div class="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-[#050505] ring-2 ring-[#050505]/30 flex items-center justify-center pointer-events-none z-20">
+                <div class="w-1 h-1 rounded-full bg-[#183350]"></div>
+              </div>
+
+              <!-- Right: Speed, VoNR, 5G+, Green Battery Chip -->
+              <div class="flex items-center gap-1.5 text-[10px] text-m3-textPrimary z-10">
+                <span class="font-mono text-[8px] text-m3-textSecondary">1.77 KB/s</span>
+                <span class="font-bold text-[9px] text-m3-textSecondary">VoNR</span>
+                <span class="font-extrabold text-[10px] text-m3-textPrimary">5G+</span>
+                <div class="flex items-center px-1.5 py-0.2 rounded-full bg-emerald-500 text-white text-[8px] font-mono font-extrabold ml-0.5">
+                  <span>60%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- SYSTEM HEADS-UP NOTIFICATION (EXACT MATCH SCREENSHOT 4) -->
+            <div id="heads-up-alert" class="heads-up-notif absolute top-10 left-3 right-3 z-50 bg-[#161918]/95 backdrop-blur-md px-3.5 py-2.5 rounded-[20px] shadow-2xl border border-white/10 flex items-center justify-between text-white select-none cursor-pointer hover:bg-[#202523] active:scale-[0.98] transition-all" onclick="SubZeroShowcase.openWarningSheet()">
+              <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-full bg-emerald-600/30 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30">
+                  <svg class="w-4 h-4 fill-current text-amber-400" viewBox="0 0 24 24">
+                    <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="text-[10.5px] font-bold flex items-center gap-1 text-slate-100">
+                    <span class="text-amber-400 font-bold">⚠️ Hidden Recurring Charge</span>
+                    <span class="text-[9px] text-slate-400 font-normal">• now</span>
+                  </div>
+                  <p class="text-[9.5px] text-slate-300 leading-tight">
+                    DocuScan Pro auto-renews at ₹899/mo after 3 days. Tap to inspect.
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center gap-1">
+                <img src="subzero_logo.png" alt="SubZero" class="w-6 h-6 object-contain bg-transparent">
+                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </div>
+            </div>
+
+            <!-- SCROLLABLE SCREEN CONTAINER -->
+            <div class="flex-1 overflow-y-auto px-3.5 pb-1.5 pt-1 relative scrollbar-none overscroll-contain" id="phone-content-scroller">
+              
+              <!-- ================= VIEW 1: MAIN DASHBOARD (EXACT SCREENSHOT 5) ================= -->
+              <div id="screen-dashboard" class="app-screen visible-screen space-y-3">
+                
+                <!-- SubZero Top Bar -->
+                <div class="flex items-center justify-between pt-0.5">
+                  <div class="flex items-center gap-2.5">
+                    <img src="subzero_logo.png" alt="SubZero" class="w-9 h-9 object-contain bg-transparent drop-shadow-sm">
+                    <div>
+                      <h2 class="font-sans font-extrabold text-[22px] text-m3-textPrimary tracking-tight leading-none">SubZero</h2>
+                      <p class="text-[10.5px] font-medium text-m3-textSecondary mt-0.5">Daily Synced • On-Device Guardian</p>
+                    </div>
+                  </div>
+                  
+                  <!-- Real Demo Button from App -->
+                  <button id="phone-btn-walkthrough" class="px-3 py-1.5 rounded-full bg-white text-m3-pine text-xs font-bold flex items-center gap-1.5 shadow-sm border border-m3-variant hover:bg-slate-50 transition-all transform active:scale-95 cursor-pointer" onclick="SubZeroShowcase.launchDemoTrap()">
+                    <svg class="w-3.5 h-3.5 fill-current text-m3-pine" viewBox="0 0 24 24">
+                      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    <span>Demo</span>
+                  </button>
+                </div>
+
+                <!-- Centered 3 Metric Tiles (Active 5, Monthly Drain ₹3435, Blocked 15) -->
+                <div class="grid grid-cols-3 gap-2" id="metric-tiles-group">
+                  <!-- Active: 5 -->
+                  <div class="bg-white py-2.5 px-1.5 rounded-[20px] shadow-sm border border-m3-variant flex flex-col items-center justify-center text-center transition-all duration-300 cursor-pointer hover:border-m3-pine/50 active:scale-95" id="tile-active-mandates" onclick="SubZeroShowcase.clickMetricTile('active')">
+                    <span class="text-[10.5px] font-medium text-m3-textSecondary">Active</span>
+                    <span class="text-[22px] font-extrabold text-m3-textPrimary mt-0.5 tracking-tight" id="metric-active-count">5</span>
+                  </div>
+
+                  <!-- Monthly Drain: ₹3435 -->
+                  <div class="bg-white py-2.5 px-1.5 rounded-[20px] shadow-sm border border-m3-variant flex flex-col items-center justify-center text-center transition-all duration-300 cursor-pointer hover:border-m3-pine/50 active:scale-95" id="tile-monthly-drain" onclick="SubZeroShowcase.clickMetricTile('drain')">
+                    <span class="text-[10.5px] font-medium text-m3-textSecondary">Monthly Drain</span>
+                    <span class="text-[22px] font-extrabold text-m3-textPrimary mt-0.5 tracking-tight" id="metric-monthly-drain">₹3435</span>
+                  </div>
+
+                  <!-- Blocked Traps: 15 -->
+                  <div class="bg-white py-2.5 px-1.5 rounded-[20px] shadow-sm border border-m3-variant flex flex-col items-center justify-center text-center transition-all duration-300 cursor-pointer hover:border-m3-pine/50 active:scale-95" id="tile-blocked-traps" onclick="SubZeroShowcase.clickMetricTile('traps')">
+                    <span class="text-[10.5px] font-medium text-m3-textSecondary">Blocked Traps</span>
+                    <span class="text-[22px] font-extrabold text-m3-textPrimary mt-0.5 tracking-tight" id="metric-blocked-traps">15</span>
+                  </div>
+                </div>
+
+                <!-- Exposure Limit Gauge Card -->
+                <div class="bg-white p-3.5 rounded-[22px] shadow-sm border border-m3-variant space-y-2.5 cursor-pointer hover:border-m3-pine/50 active:scale-[0.99] transition-all" onclick="SubZeroShowcase.clickExposureLimit()">
+                  <div class="flex items-center gap-2.5">
+                    <svg class="w-4 h-4 text-m3-pine shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z"/>
+                    </svg>
+                    <div>
+                      <div class="font-bold text-[13px] text-m3-textPrimary leading-tight">Protection Exposure Limit</div>
+                      <div class="text-[10.5px] text-m3-textSecondary">Monthly auto-debit ceiling: ₹5,000</div>
+                    </div>
+                  </div>
+
+                  <!-- Dark Pine Progress Bar on Mint Container -->
+                  <div class="w-full h-2.5 bg-m3-pineContainer rounded-full overflow-hidden">
+                    <div class="h-full bg-m3-pine rounded-full w-[68%] transition-all duration-500"></div>
+                  </div>
+                </div>
+
+                <!-- Connected UPI Apps Carousel (Screenshot 5) -->
+                <div>
+                  <div class="flex items-center justify-between mb-1.5 px-0.5">
+                    <h3 class="text-[13px] font-bold text-m3-textPrimary">Connected UPI Apps</h3>
+                    <span class="text-[10.5px] text-m3-textSecondary">Tap to sync</span>
+                  </div>
+
+                  <div class="grid grid-cols-3 gap-2" id="connected-apps-row">
+                    <!-- PhonePe -->
+                    <div class="bg-white p-2.5 rounded-[18px] shadow-sm border border-m3-variant flex flex-col justify-between h-[88px] cursor-pointer hover:border-m3-pine/50 active:scale-95 transition-all" id="app-card-phonepe" onclick="SubZeroShowcase.syncUpiApp('PhonePe')">
+                      <div class="flex items-start justify-between">
+                        <div class="w-7 h-7 rounded-full bg-[#5F259F] flex items-center justify-center text-white font-bold text-xs shadow-sm">
+                          पे
+                        </div>
+                        <span class="w-4 h-4 rounded-full bg-m3-pineContainer text-m3-pine text-[9px] font-bold flex items-center justify-center">1</span>
+                      </div>
+                      <div>
+                        <div class="font-bold text-[12px] text-m3-textPrimary leading-tight">PhonePe</div>
+                        <div class="text-[9.5px] text-m3-textSecondary">1 AutoPay</div>
+                      </div>
+                    </div>
+
+                    <!-- Google Pay -->
+                    <div class="bg-white p-2.5 rounded-[18px] shadow-sm border border-m3-variant flex flex-col justify-between h-[88px] cursor-pointer hover:border-m3-pine/50 active:scale-95 transition-all" id="app-card-gpay" onclick="SubZeroShowcase.syncUpiApp('Google Pay')">
+                      <div class="flex items-start justify-between">
+                        <div class="w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-sm border border-slate-100 p-1">
+                          <svg viewBox="0 0 24 24" class="w-full h-full">
+                            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
+                            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.15C3.26 21.4 7.33 24 12 24Z"/>
+                            <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.24C.45 8.16 0 9.98 0 12s.45 3.84 1.24 5.42l4.04-3.15Z"/>
+                            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.6 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98Z"/>
+                          </svg>
+                        </div>
+                        <span class="w-4 h-4 rounded-full bg-m3-pineContainer text-m3-pine text-[9px] font-bold flex items-center justify-center">1</span>
+                      </div>
+                      <div>
+                        <div class="font-bold text-[12px] text-m3-textPrimary leading-tight">Google Pay</div>
+                        <div class="text-[9.5px] text-m3-textSecondary">1 AutoPay</div>
+                      </div>
+                    </div>
+
+                    <!-- Paytm -->
+                    <div class="bg-white p-2.5 rounded-[18px] shadow-sm border border-m3-variant flex flex-col justify-between h-[88px] cursor-pointer hover:border-m3-pine/50 active:scale-95 transition-all" id="app-card-paytm" onclick="SubZeroShowcase.syncUpiApp('Paytm')">
+                      <div class="flex items-start justify-between">
+                        <div class="w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-sm border border-slate-100 p-0.5">
+                          <span class="text-[9px] font-extrabold text-[#002970] font-sans">Paytm</span>
+                        </div>
+                      </div>
+                      <div>
+                        <div class="font-bold text-[12px] text-m3-textPrimary leading-tight">Paytm</div>
+                        <div class="text-[9.5px] text-m3-textSecondary">1 AutoPay</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Guardian Security Toggles (Single Card, 4 Rows, M3 Checkmark Switches) -->
+                <div class="bg-white px-3.5 py-1.5 rounded-[22px] shadow-sm border border-m3-variant space-y-1" id="guardian-toggles-card">
+                  
+                  <!-- Switch 1: Screen Watcher (SLM AI) -->
+                  <div class="flex items-center justify-between py-2 cursor-pointer" onclick="SubZeroShowcase.toggleM3Switch('switch-slm')">
+                    <div class="flex items-center gap-2.5">
+                      <svg class="w-5 h-5 text-m3-textSecondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                      </svg>
+                      <div>
+                        <div class="font-bold text-[12px] text-m3-textPrimary leading-tight">Screen Watcher (SLM AI)</div>
+                        <div class="text-[9.5px] text-m3-textSecondary leading-snug">Intercepts deceptive 3-day trial terms before payment</div>
+                      </div>
+                    </div>
+                    <!-- Tactile M3 Switch with Checkmark -->
+                    <div class="w-9 h-5 bg-m3-pine rounded-full p-0.5 transition-colors relative shrink-0 ml-2" id="switch-slm">
+                      <div class="w-4 h-4 bg-white rounded-full shadow m3-switch-thumb translate-x-4 flex items-center justify-center text-m3-pine">
+                        <svg class="w-2.5 h-2.5 stroke-current" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="h-[1px] bg-m3-canvas w-full"></div>
+
+                  <!-- Switch 2: Start-of-Day Daily Sync -->
+                  <div class="flex items-center justify-between py-2 cursor-pointer" onclick="SubZeroShowcase.toggleM3Switch('switch-daily')">
+                    <div class="flex items-center gap-2.5">
+                      <svg class="w-5 h-5 text-m3-textSecondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                      </svg>
+                      <div>
+                        <div class="font-bold text-[12px] text-m3-textPrimary leading-tight">Start-of-Day Daily Sync</div>
+                        <div class="text-[9.5px] text-m3-textSecondary leading-snug">Audits all UPI apps every morning at 06:00 AM</div>
+                      </div>
+                    </div>
+                    <div class="w-9 h-5 bg-m3-pine rounded-full p-0.5 transition-colors relative shrink-0 ml-2" id="switch-daily">
+                      <div class="w-4 h-4 bg-white rounded-full shadow m3-switch-thumb translate-x-4 flex items-center justify-center text-m3-pine">
+                        <svg class="w-2.5 h-2.5 stroke-current" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="h-[1px] bg-m3-canvas w-full"></div>
+
+                  <!-- Switch 3: 48-Hour Pre-Debit Alarm -->
+                  <div class="flex items-center justify-between py-2 cursor-pointer" onclick="SubZeroShowcase.toggleM3Switch('switch-alarm')">
+                    <div class="flex items-center gap-2.5">
+                      <svg class="w-5 h-5 text-m3-textSecondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                      </svg>
+                      <div>
+                        <div class="font-bold text-[12px] text-m3-textPrimary leading-tight">48-Hour Pre-Debit Alarm</div>
+                        <div class="text-[9.5px] text-m3-textSecondary leading-snug">Reminds you 48 hours before interbank clearing lock-in</div>
+                      </div>
+                    </div>
+                    <div class="w-9 h-5 bg-m3-pine rounded-full p-0.5 transition-colors relative shrink-0 ml-2" id="switch-alarm">
+                      <div class="w-4 h-4 bg-white rounded-full shadow m3-switch-thumb translate-x-4 flex items-center justify-center text-m3-pine">
+                        <svg class="w-2.5 h-2.5 stroke-current" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="h-[1px] bg-m3-canvas w-full"></div>
+
+                  <!-- Switch 4: Haptic Alerts -->
+                  <div class="flex items-center justify-between py-2 cursor-pointer" onclick="SubZeroShowcase.toggleM3Switch('switch-haptic')">
+                    <div class="flex items-center gap-2.5">
+                      <svg class="w-5 h-5 text-m3-textSecondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <rect x="5" y="2" width="14" height="20" rx="2" stroke-width="2"/>
+                        <path stroke-linecap="round" stroke-width="2" d="M2 7v10M22 7v10"/>
+                      </svg>
+                      <div>
+                        <div class="font-bold text-[12px] text-m3-textPrimary leading-tight">Haptic Alerts</div>
+                        <div class="text-[9.5px] text-m3-textSecondary leading-snug">Provides tactile pulse whenever a trap is caught</div>
+                      </div>
+                    </div>
+                    <div class="w-9 h-5 bg-m3-pine rounded-full p-0.5 transition-colors relative shrink-0 ml-2" id="switch-haptic">
+                      <div class="w-4 h-4 bg-white rounded-full shadow m3-switch-thumb translate-x-4 flex items-center justify-center text-m3-pine">
+                        <svg class="w-2.5 h-2.5 stroke-current" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Active Mandates Header (Screenshot 1) -->
+                <div class="space-y-2 pt-1" id="active-mandates-section">
+                  <div class="flex items-center justify-between px-0.5">
+                    <h3 class="text-[15px] font-bold text-m3-textPrimary">Active Mandates</h3>
+                    <span class="text-[11px] text-m3-textSecondary font-medium">5 Indexed</span>
+                  </div>
+
+                  <!-- Mandate Card 1: Spotify (Screenshot 1) -->
+                  <div class="bg-white p-3.5 rounded-[22px] shadow-sm border border-m3-variant space-y-3 transition-all duration-300" id="mandate-card-spotify">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-full bg-m3-pineContainer text-m3-pine flex items-center justify-center font-bold text-sm">
+                          S
+                        </div>
+                        <div>
+                          <h4 class="font-bold text-[14px] text-m3-textPrimary leading-tight">Spotify</h4>
+                          <div class="flex items-center gap-1 text-[10.5px] text-m3-textSecondary">
+                            <span>Active in:</span>
+                            <span class="font-bold text-m3-pine">PhonePe</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <div class="font-extrabold text-[15px] text-m3-pine">₹139/mo</div>
+                      </div>
+                    </div>
+
+                    <!-- Bottom Action Row -->
+                    <div class="flex items-center justify-between pt-1">
+                      <div class="px-2.5 py-1 rounded-full bg-m3-badgeMint text-m3-pine text-[10px] font-bold flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span>Renews in 5 days</span>
+                      </div>
+                      <button id="btn-stop-spotify" class="px-3 py-1 rounded-full bg-m3-alertCoralContainer text-m3-alertCoral hover:bg-m3-alertCoral hover:text-white font-bold text-[11px] transition-all" onclick="SubZeroShowcase.openCancelSheet('Spotify')">
+                        Stop in PhonePe
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Mandate Card 2: StreamVibe HD (Screenshot 1) -->
+                  <div class="bg-white p-3.5 rounded-[22px] shadow-sm border border-m3-variant space-y-3 transition-all duration-300" id="mandate-card-streamvibe">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-full bg-m3-pineContainer text-m3-pine flex items-center justify-center font-bold text-sm">
+                          S
+                        </div>
+                        <div>
+                          <h4 class="font-bold text-[14px] text-m3-textPrimary leading-tight">StreamVibe HD</h4>
+                          <div class="flex items-center gap-1 text-[10.5px] text-m3-textSecondary">
+                            <span>Active in:</span>
+                            <span class="font-bold text-m3-pine">Google Pay</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <div class="font-extrabold text-[15px] text-m3-pine">₹1199/mo</div>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-1">
+                      <div class="px-2.5 py-1 rounded-full bg-m3-badgeMint text-m3-pine text-[10px] font-bold flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span>Renews in 14 days</span>
+                      </div>
+                      <button class="px-3 py-1 rounded-full bg-m3-alertCoralContainer text-m3-alertCoral hover:bg-m3-alertCoral hover:text-white font-bold text-[11px] transition-all" onclick="SubZeroShowcase.openCancelSheet('StreamVibe HD')">
+                        Stop in Google Pay
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Mandate Card 3: Broadband Fiber -->
+                  <div class="bg-white p-3.5 rounded-[22px] shadow-sm border border-m3-variant space-y-3 transition-all duration-300" id="mandate-card-broadband">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-full bg-m3-pineContainer text-m3-pine flex items-center justify-center font-bold text-sm">
+                          B
+                        </div>
+                        <div>
+                          <h4 class="font-bold text-[14px] text-m3-textPrimary leading-tight">Broadband Fiber</h4>
+                          <div class="flex items-center gap-1 text-[10.5px] text-m3-textSecondary">
+                            <span>Active in:</span>
+                            <span class="font-bold text-m3-pine">BHIM UPI</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <div class="font-extrabold text-[15px] text-m3-pine">₹799/mo</div>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-1">
+                      <div class="px-2.5 py-1 rounded-full bg-m3-badgeMint text-m3-pine text-[10px] font-bold flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span>Renews in 19 days</span>
+                      </div>
+                      <button class="px-3 py-1 rounded-full bg-m3-alertCoralContainer text-m3-alertCoral hover:bg-m3-alertCoral hover:text-white font-bold text-[11px] active:scale-95 transition-all cursor-pointer" onclick="SubZeroShowcase.openCancelSheet('Broadband Fiber')">
+                        Stop in BHIM UPI
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+
+              <!-- ================= VIEW 2: SIMULATED DECEPTIVE PAYWALL (EXACT SCREENSHOT 2) ================= -->
+              <div id="screen-paywall" class="app-screen hidden-screen h-full flex flex-col justify-between py-1 text-m3-textPrimary">
+                
+                <!-- Paywall Top Bar: [📄] DocuScan • v4.2 and Close ✕ Button -->
+                <div class="flex items-center justify-between pt-1">
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-m3-pineContainer text-m3-pine flex items-center justify-center font-bold text-sm">
+                      📄
+                    </div>
+                    <span class="font-bold text-[14px] text-m3-textPrimary">DocuScan • v4.2</span>
+                  </div>
+                  <button class="w-8 h-8 rounded-full bg-white shadow-sm border border-m3-variant text-m3-textSecondary flex items-center justify-center text-xs font-bold hover:bg-slate-50" onclick="SubZeroShowcase.showDashboard()">
+                    ✕
+                  </button>
+                </div>
+
+                <!-- Big Headline from Screenshot 2 -->
+                <div class="text-center pt-5 pb-3">
+                  <h2 class="font-sans font-extrabold text-[22px] text-m3-textPrimary leading-tight">
+                    Unlock Pro Document Tools
+                  </h2>
+                  <p class="text-[11px] text-m3-textSecondary mt-1 px-4">
+                    Unlimited PDF scanning, OCR text extraction, and export.
+                  </p>
+                </div>
+
+                <!-- Feature Card (Screenshot 2) -->
+                <div class="bg-white p-4 rounded-[26px] shadow-sm border border-m3-variant space-y-4 my-auto">
+                  
+                  <!-- Feature 1: Fast OCR -->
+                  <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-full bg-m3-pineContainer text-m3-pine flex items-center justify-center shrink-0 mt-0.5">
+                      <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    </div>
+                    <div>
+                      <div class="font-bold text-[13px] text-m3-textPrimary">Fast OCR</div>
+                      <div class="text-[11px] text-m3-textSecondary leading-snug">Extract text from images and documents in under a second.</div>
+                    </div>
+                  </div>
+
+                  <!-- Feature 2: Watermark Removal -->
+                  <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-full bg-m3-pineContainer text-m3-pine flex items-center justify-center shrink-0 mt-0.5">
+                      <svg class="w-4 h-4 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    </div>
+                    <div>
+                      <div class="font-bold text-[13px] text-m3-textPrimary">Watermark Removal</div>
+                      <div class="text-[11px] text-m3-textSecondary leading-snug">Clean, professional document exports with zero branding.</div>
+                    </div>
+                  </div>
+
+                  <!-- Feature 3: Cloud Backup -->
+                  <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-full bg-m3-pineContainer text-m3-pine flex items-center justify-center shrink-0 mt-0.5">
+                      <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+                    </div>
+                    <div>
+                      <div class="font-bold text-[13px] text-m3-textPrimary">Cloud Backup</div>
+                      <div class="text-[11px] text-m3-textSecondary leading-snug">Secure synchronization across all your mobile devices.</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- CTA & Microscopic Fine Print (Screenshot 2) -->
+                <div class="space-y-2 pt-4 pb-2" id="paywall-action-container">
+                  <button id="btn-paywall-cta" class="w-full py-3.5 px-4 rounded-full bg-m3-pine text-white font-extrabold text-[13px] tracking-wide shadow-md hover:bg-m3-pineDark transition-all transform active:scale-95" onclick="SubZeroShowcase.triggerIntercept()">
+                    START 3-DAY FREE TRIAL
+                  </button>
+                  
+                  <!-- Exact Microscopic Text from Screenshot 2 -->
+                  <p class="text-[8px] text-[#94A3B8] leading-tight text-center px-4" id="paywall-hidden-fineprint">
+                    Renews at ₹899/month automatically via UPI AutoPay after 72 hours. Cancel anytime in payment settings.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+
+            <!-- ================= VIEW 3: WARNING DIALOG MODAL (EXACT SCREENSHOT 3 & 4) ================= -->
+            <div id="modal-warning-sheet" class="m3-dialog-backdrop absolute inset-0 z-50 bg-black/60 backdrop-blur-[2px] flex items-center justify-center p-3.5" onclick="if(event.target === this) SubZeroShowcase.dismissWarningSheet()">
+              <div class="m3-dialog-card bg-white p-5 rounded-[26px] shadow-2xl border border-m3-variant w-full max-w-[315px] space-y-3 select-none">
+                
+                <!-- Warning Badge + Risk Tag -->
+                <div class="flex items-center justify-between">
+                  <div class="px-2.5 py-1 rounded-full bg-m3-alertCoralContainer text-m3-alertCoral text-[10px] font-bold flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+                    <span>Dark Pattern Detected</span>
+                  </div>
+                  <span class="text-m3-alertCoral text-[11px] font-extrabold tracking-wider font-mono">RISK 92%</span>
+                </div>
+
+                <!-- Headline & Description from Screenshot 3 -->
+                <div>
+                  <h3 class="font-sans font-bold text-[16px] text-m3-textPrimary leading-snug" id="warning-modal-title">This Free Trial is Not Free</h3>
+                  <p class="text-[11px] text-m3-textSecondary leading-snug mt-1" id="warning-modal-desc">
+                    DocuScan Pro will automatically deduct ₹899 every month starting in 3 days via UPI AutoPay.
+                  </p>
+                </div>
+
+                <!-- Language Selector Chips (Interactive Multi-Language) -->
+                <div class="w-full bg-m3-canvas p-1 rounded-full flex items-center text-[10.5px] font-semibold">
+                  <button id="btn-lang-en" class="flex-1 py-1 rounded-full bg-white text-m3-textPrimary shadow-sm text-center font-bold transition-all cursor-pointer" onclick="SubZeroShowcase.setWarningLanguage('en')">English</button>
+                  <button id="btn-lang-te" class="flex-1 py-1 rounded-full text-m3-textSecondary hover:text-m3-textPrimary text-center transition-all cursor-pointer" onclick="SubZeroShowcase.setWarningLanguage('te')">తెలుగు</button>
+                  <button id="btn-lang-hi" class="flex-1 py-1 rounded-full text-m3-textSecondary hover:text-m3-textPrimary text-center transition-all cursor-pointer" onclick="SubZeroShowcase.setWarningLanguage('hi')">हिंदी</button>
+                </div>
+
+                <!-- Breakdown Table (Screenshot 3) -->
+                <div class="bg-m3-canvas p-3 rounded-[18px] space-y-1.5 text-[11px]">
+                  <div class="flex items-center justify-between">
+                    <span class="text-m3-textSecondary font-medium">Target App</span>
+                    <strong class="text-m3-textPrimary font-bold">DocuScan Pro</strong>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-m3-textSecondary font-medium">Hidden AutoPay</span>
+                    <strong class="text-m3-alertCoral font-bold">₹899.00 / month</strong>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-m3-textSecondary font-medium">Auto-Deduction</span>
+                    <strong class="text-m3-textPrimary font-bold">After 72 Hours</strong>
+                  </div>
+                </div>
+
+                <!-- Action Buttons: Block AutoPay & Dismiss (Screenshot 3) -->
+                <div class="flex items-center gap-2 pt-1">
+                  <button id="btn-block-trap" class="flex-1 py-2.5 rounded-full bg-m3-alertCoral text-white font-bold text-[12px] shadow-sm hover:opacity-90 active:scale-95 transition-all cursor-pointer" onclick="SubZeroShowcase.blockAndExitTrap()">
+                    Block AutoPay
+                  </button>
+                  <button class="flex-1 py-2.5 rounded-full bg-m3-canvas text-m3-textPrimary font-bold text-[12px] hover:bg-slate-200 active:scale-95 transition-colors cursor-pointer" onclick="SubZeroShowcase.dismissWarningSheet()">
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            </div>
+
+
+            <!-- ================= VIEW 4: ASSISTED REVOCATION GUIDE SHEET (WITH PROPER BACKDROP) ================= -->
+            <div id="modal-cancel-backdrop" class="m3-dialog-backdrop absolute inset-0 z-50 bg-black/60 backdrop-blur-[2px] flex flex-col justify-end" onclick="if(event.target === this) SubZeroShowcase.closeCancelSheet()">
+              <div id="modal-cancel-sheet" class="m3-bottom-sheet w-full bg-white px-5 pt-3.5 pb-5 rounded-t-[28px] shadow-2xl border-t border-m3-variant space-y-3.5 select-none">
+                <div class="w-10 h-1 bg-slate-300 rounded-full mx-auto"></div>
+
+                <!-- Header with App Badge -->
+                <div class="flex items-center justify-between pt-0.5">
+                  <div>
+                    <h3 class="font-sans font-bold text-[16px] text-m3-textPrimary" id="cancel-sheet-title">Cancel Subscription</h3>
+                    <p class="text-[10.5px] font-mono text-m3-textSecondary mt-0.5" id="cancel-sheet-umn">UMN: Copied to clipboard</p>
+                  </div>
+                  <span class="px-3 py-1 rounded-full bg-m3-pineContainer text-m3-pine text-[11px] font-bold font-mono" id="cancel-sheet-badge">PhonePe</span>
+                </div>
+
+                <div class="h-[1px] bg-m3-canvas w-full"></div>
+
+                <!-- 3-Step Checklist -->
+                <div class="text-[11.5px] text-m3-textPrimary space-y-2 leading-snug">
+                  <div class="flex items-start gap-2">
+                    <span class="w-4 h-4 rounded-full bg-m3-canvas text-m3-pine text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+                    <span>Tap your <strong>Profile icon</strong> at the top left of <span id="cancel-step-app-1">PhonePe</span>.</span>
+                  </div>
+                  <div class="flex items-start gap-2">
+                    <span class="w-4 h-4 rounded-full bg-m3-canvas text-m3-pine text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+                    <span>Open <strong>'AutoPay Settings'</strong> under Payment Management.</span>
+                  </div>
+                  <div class="flex items-start gap-2">
+                    <span class="w-4 h-4 rounded-full bg-m3-canvas text-m3-pine text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+                    <span>Locate this mandate and tap <strong>'Pause'</strong> or <strong>'Revoke'</strong>.</span>
+                  </div>
+                </div>
+
+                <!-- Two Action Buttons -->
+                <div class="space-y-2 pt-1" id="cancel-sheet-buttons">
+                  <button id="btn-open-upi-app" class="w-full py-3 rounded-full bg-m3-pine text-white font-bold text-[12px] shadow-md hover:bg-m3-pineDark active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer" onclick="SubZeroShowcase.completeRevoke()">
+                    <span>Open PhonePe &amp; Cancel Subscription</span>
+                  </button>
+
+                  <button class="w-full py-2.5 rounded-full bg-m3-canvas text-m3-textPrimary font-bold text-[12px] hover:bg-slate-200 active:scale-95 transition-colors cursor-pointer" onclick="SubZeroShowcase.closeCancelSheet()">
+                    Done
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- M3 INTERACTIVE SNACKBAR TOAST -->
+            <div id="phone-toast" class="absolute bottom-6 left-3 right-3 z-50 bg-[#1F2723]/95 backdrop-blur-md text-white text-[11px] font-medium px-4 py-2.5 rounded-full shadow-2xl border border-white/10 flex items-center justify-between pointer-events-none opacity-0 translate-y-3 transition-all duration-300 select-none">
+              <div class="flex items-center gap-2" id="phone-toast-content">
+                <span class="text-emerald-400 font-bold">✓</span>
+                <span id="phone-toast-text">Notification</span>
+              </div>
+            </div>
+
+            <!-- Android Home Gesture Pill (Screenshot 1-5) -->
+            <div class="h-4 w-full flex items-center justify-center pb-1 select-none z-40 bg-transparent shrink-0 cursor-pointer" onclick="SubZeroShowcase.showDashboard()" title="Tap to return Home">
+              <div class="w-24 h-1 bg-slate-400/80 rounded-full hover:bg-slate-600 transition-colors"></div>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <!-- ================= JAVASCRIPT ENGINE ================= -->
+  <script>
+    /**
+     * CLASS: NarrationController
+     * Web Speech API controller with natural voice selection & synchronized transcript.
+     */
+    class NarrationController {
+      constructor() {
+        this.synth = ('speechSynthesis' in window) ? window.speechSynthesis : null;
+        this.isMuted = false;
+        this.activeUtterance = null;
+        this.selectedVoice = null;
+        this.activeTimeout = null;
+        this.activeResolve = null;
+        this.captionElement = document.getElementById('live-caption-text');
+        this.soundwaveAnim = document.getElementById('soundwave-anim');
+        this.speakerBadge = document.getElementById('speaker-badge');
+
+        this.initVoices();
+      }
+
+      initVoices() {
+        if (!this.synth) {
+          if (this.speakerBadge) this.speakerBadge.innerText = 'Text Mode';
+          return;
+        }
+
+        const populate = () => {
+          try {
+            const voices = this.synth.getVoices();
+            this.selectedVoice = voices.find(v => 
+              v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('David'))
+            ) || voices.find(v => v.lang.startsWith('en')) || voices[0];
+          } catch (e) {}
+        };
+
+        populate();
+        if (this.synth.onvoiceschanged !== undefined) {
+          this.synth.onvoiceschanged = populate;
+        }
+      }
+
+      toggleMute() {
+        this.isMuted = !this.isMuted;
+        const textVolume = document.getElementById('text-volume');
+        const iconVolume = document.getElementById('icon-volume');
+
+        if (this.isMuted) {
+          this.stop();
+          if (textVolume) textVolume.innerText = 'Narration: OFF';
+          if (iconVolume) {
+            iconVolume.innerHTML = '<path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>';
+          }
+          if (this.soundwaveAnim) this.soundwaveAnim.style.opacity = '0.2';
+        } else {
+          if (textVolume) textVolume.innerText = 'Narration: ON';
+          if (iconVolume) {
+            iconVolume.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>';
+          }
+          if (this.soundwaveAnim) this.soundwaveAnim.style.opacity = '1';
+        }
+        return this.isMuted;
+      }
+
+      speak(text, expectedDurationMs = 7000, signal = null) {
+        if (signal && signal.aborted) {
+          return Promise.resolve();
+        }
+
+        return new Promise((resolve) => {
+          let hasFinished = false;
+
+          const finish = () => {
+            if (hasFinished) return;
+            hasFinished = true;
+            if (this.activeTimeout) {
+              clearTimeout(this.activeTimeout);
+              this.activeTimeout = null;
+            }
+            if (this.activeUtterance) {
+              this.activeUtterance.onend = null;
+              this.activeUtterance.onerror = null;
+              this.activeUtterance = null;
+            }
+            if (signal) {
+              signal.removeEventListener('abort', onAbort);
+            }
+            this.activeResolve = null;
+            if (this.soundwaveAnim) {
+              this.soundwaveAnim.style.opacity = '0.2';
+            }
+            resolve();
+          };
+
+          const onAbort = () => {
+            if (this.synth) {
+              try {
+                this.synth.cancel();
+              } catch (e) {}
+            }
+            finish();
+          };
+
+          if (signal) {
+            signal.addEventListener('abort', onAbort, { once: true });
+          }
+
+          this.stop(); // Stop any currently speaking voice
+
+          this.activeResolve = finish;
+
+          if (this.captionElement) {
+            this.captionElement.style.opacity = '0.5';
+            this.captionElement.innerText = `"${text}"`;
+            setTimeout(() => {
+              if (this.captionElement) this.captionElement.style.opacity = '1';
+            }, 80);
+          }
+
+          if (this.soundwaveAnim) {
+            this.soundwaveAnim.style.opacity = this.isMuted ? '0.2' : '1';
+          }
+
+          if (this.isMuted || !this.synth) {
+            const t = setTimeout(finish, Math.min(expectedDurationMs, 6000));
+            this.activeTimeout = t;
+            return;
+          }
+
+          try {
+            if (this.synth.paused) {
+              try { this.synth.resume(); } catch (e) {}
+            }
+            try { this.synth.cancel(); } catch (e) {}
+
+            const utter = new SpeechSynthesisUtterance(text);
+            if (this.selectedVoice) utter.voice = this.selectedVoice;
+            utter.rate = 1.02;
+            utter.pitch = 1.0;
+            utter.lang = 'en-US';
+
+            utter.onend = finish;
+            utter.onerror = finish;
+
+            this.activeTimeout = setTimeout(finish, expectedDurationMs + 1000);
+            this.activeUtterance = utter;
+            this.synth.speak(utter);
+          } catch (e) {
+            finish();
+          }
+        });
+      }
+
+      stop() {
+        if (this.activeTimeout) {
+          clearTimeout(this.activeTimeout);
+          this.activeTimeout = null;
+        }
+        if (this.activeResolve) {
+          const r = this.activeResolve;
+          this.activeResolve = null;
+          r();
+        }
+        if (this.synth) {
+          try {
+            this.synth.pause();
+            this.synth.cancel();
+            this.synth.resume();
+          } catch (e) {}
+        }
+        if (this.soundwaveAnim) {
+          this.soundwaveAnim.style.opacity = '0.2';
+        }
+      }
+    }
+
+
+    /**
+     * CLASS: SubZeroShowcase
+     * State manager for views, M3 bottom sheets, and interactive toggle switches.
+     */
+    class SubZeroShowcase {
+      static _activeTimeouts = new Set();
+
+      static safeTimeout(fn, delay) {
+        let id;
+        id = setTimeout(() => {
+          this._activeTimeouts.delete(id);
+          fn();
+        }, delay);
+        this._activeTimeouts.add(id);
+        return id;
+      }
+
+      static clearPendingTimeouts() {
+        this._activeTimeouts.forEach(id => clearTimeout(id));
+        this._activeTimeouts.clear();
+      }
+
+      static showToast(message, icon = '✓') {
+        const toast = document.getElementById('phone-toast');
+        const text = document.getElementById('phone-toast-text');
+        const content = document.getElementById('phone-toast-content');
+        if (!toast || !text) return;
+        text.innerText = message;
+        if (content) {
+          content.innerHTML = `<span class="text-emerald-400 font-bold">${icon}</span><span>${message}</span>`;
+        }
+        toast.classList.remove('opacity-0', 'translate-y-3');
+        toast.classList.add('opacity-100', 'translate-y-0');
+        clearTimeout(this._toastTimeout);
+        this._toastTimeout = setTimeout(() => {
+          toast.classList.remove('opacity-100', 'translate-y-0');
+          toast.classList.add('opacity-0', 'translate-y-3');
+        }, 2600);
+      }
+
+      static showDashboard() {
+        const dashboard = document.getElementById('screen-dashboard');
+        const paywall = document.getElementById('screen-paywall');
+        const warningSheet = document.getElementById('modal-warning-sheet');
+        const cancelBackdrop = document.getElementById('modal-cancel-backdrop');
+        const headsUp = document.getElementById('heads-up-alert');
+        const scroller = document.getElementById('phone-content-scroller');
+
+        if (dashboard) {
+          dashboard.classList.remove('hidden-screen');
+          dashboard.classList.add('visible-screen');
+        }
+        if (paywall) {
+          paywall.classList.add('hidden-screen');
+          paywall.classList.remove('visible-screen');
+        }
+        if (scroller) scroller.scrollTop = 0;
+        if (warningSheet) warningSheet.classList.remove('open');
+        if (cancelBackdrop) cancelBackdrop.classList.remove('open');
+        if (headsUp) headsUp.classList.remove('show');
+      }
+
+      static showPaywall() {
+        const dashboard = document.getElementById('screen-dashboard');
+        const paywall = document.getElementById('screen-paywall');
+        const warningSheet = document.getElementById('modal-warning-sheet');
+        const cancelBackdrop = document.getElementById('modal-cancel-backdrop');
+        const headsUp = document.getElementById('heads-up-alert');
+        const scroller = document.getElementById('phone-content-scroller');
+
+        if (dashboard) {
+          dashboard.classList.add('hidden-screen');
+          dashboard.classList.remove('visible-screen');
+        }
+        if (paywall) {
+          paywall.classList.remove('hidden-screen');
+          paywall.classList.add('visible-screen');
+        }
+        if (scroller) scroller.scrollTop = 0;
+        if (warningSheet) warningSheet.classList.remove('open');
+        if (cancelBackdrop) cancelBackdrop.classList.remove('open');
+        if (headsUp) headsUp.classList.remove('show');
+      }
+
+      static launchDemoTrap() {
+        if (window.walkthroughEngine && window.walkthroughEngine.isPlaying) {
+          window.walkthroughEngine.pauseTour();
+        }
+        this.showToast('Launching simulated DocuScan Pro paywall...', '⚡');
+        this.safeTimeout(() => {
+          this.showPaywall();
+        }, 350);
+      }
+
+      static triggerIntercept() {
+        const headsUp = document.getElementById('heads-up-alert');
+        const warningSheet = document.getElementById('modal-warning-sheet');
+
+        if (headsUp) headsUp.classList.add('show');
+        this.safeTimeout(() => {
+          if (warningSheet) warningSheet.classList.add('open');
+        }, 400);
+      }
+
+      static openWarningSheet() {
+        const warningSheet = document.getElementById('modal-warning-sheet');
+        if (warningSheet) warningSheet.classList.add('open');
+      }
+
+      static dismissWarningSheet() {
+        const warningSheet = document.getElementById('modal-warning-sheet');
+        const headsUp = document.getElementById('heads-up-alert');
+        if (warningSheet) warningSheet.classList.remove('open');
+        if (headsUp) headsUp.classList.remove('show');
+      }
+
+      static setWarningLanguage(lang) {
+        const title = document.getElementById('warning-modal-title');
+        const desc = document.getElementById('warning-modal-desc');
+        const btnEn = document.getElementById('btn-lang-en');
+        const btnTe = document.getElementById('btn-lang-te');
+        const btnHi = document.getElementById('btn-lang-hi');
+
+        [btnEn, btnTe, btnHi].forEach(b => {
+          if (b) {
+            b.classList.remove('bg-white', 'text-m3-textPrimary', 'shadow-sm', 'font-bold');
+            b.classList.add('text-m3-textSecondary');
+          }
+        });
+
+        if (lang === 'te') {
+          if (btnTe) {
+            btnTe.classList.add('bg-white', 'text-m3-textPrimary', 'shadow-sm', 'font-bold');
+            btnTe.classList.remove('text-m3-textSecondary');
+          }
+          if (title) title.innerText = 'ఈ ఉచిత ట్రయల్ ఉచితం కాదు';
+          if (desc) desc.innerText = 'DocuScan Pro 3 రోజుల తర్వాత ₹899 స్వయంచాలకంగా ప్రతినెలా కట్ చేస్తుంది.';
+        } else if (lang === 'hi') {
+          if (btnHi) {
+            btnHi.classList.add('bg-white', 'text-m3-textPrimary', 'shadow-sm', 'font-bold');
+            btnHi.classList.remove('text-m3-textSecondary');
+          }
+          if (title) title.innerText = 'यह फ्री ट्रायल मुफ्त नहीं है';
+          if (desc) desc.innerText = 'DocuScan Pro 3 दिनों के बाद हर महीने ₹899 अपने आप UPI AutoPay से काट लेगा।';
+        } else {
+          if (btnEn) {
+            btnEn.classList.add('bg-white', 'text-m3-textPrimary', 'shadow-sm', 'font-bold');
+            btnEn.classList.remove('text-m3-textSecondary');
+          }
+          if (title) title.innerText = 'This Free Trial is Not Free';
+          if (desc) desc.innerText = 'DocuScan Pro will automatically deduct ₹899 every month starting in 3 days via UPI AutoPay.';
+        }
+      }
+
+      static blockAndExitTrap() {
+        this.dismissWarningSheet();
+        const blockedCounter = document.getElementById('metric-blocked-traps');
+        if (blockedCounter) {
+          blockedCounter.innerText = '16';
+          blockedCounter.classList.add('scale-125', 'text-emerald-700');
+          this.safeTimeout(() => {
+            blockedCounter.classList.remove('scale-125');
+          }, 300);
+        }
+        this.showToast('AutoPay mandate blocked! ₹899/month saved.', '🛡️');
+        this.safeTimeout(() => {
+          this.showDashboard();
+        }, 400);
+      }
+
+      static openCancelSheet(merchant = 'Spotify') {
+        const backdrop = document.getElementById('modal-cancel-backdrop');
+        const title = document.getElementById('cancel-sheet-title');
+        const badge = document.getElementById('cancel-sheet-badge');
+        const umn = document.getElementById('cancel-sheet-umn');
+        const btnUpi = document.getElementById('btn-open-upi-app');
+        const stepApp = document.getElementById('cancel-step-app-1');
+
+        if (merchant.includes('Google') || merchant.includes('StreamVibe')) {
+          if (title) title.innerText = 'Cancel StreamVibe HD';
+          if (badge) badge.innerText = 'Google Pay';
+          if (umn) umn.innerText = 'UMN: STREAM-HD-9921-GPAY';
+          if (stepApp) stepApp.innerText = 'Google Pay';
+          if (btnUpi) btnUpi.innerHTML = `<span>Open Google Pay &amp; Cancel Subscription</span>`;
+        } else if (merchant.includes('Broadband') || merchant.includes('BHIM')) {
+          if (title) title.innerText = 'Cancel Broadband Fiber';
+          if (badge) badge.innerText = 'BHIM UPI';
+          if (umn) umn.innerText = 'UMN: ACTFIBER-8812-BHIM';
+          if (stepApp) stepApp.innerText = 'BHIM UPI';
+          if (btnUpi) btnUpi.innerHTML = `<span>Open BHIM UPI &amp; Cancel Subscription</span>`;
+        } else {
+          if (title) title.innerText = 'Cancel Spotify';
+          if (badge) badge.innerText = 'PhonePe';
+          if (umn) umn.innerText = 'UMN: SPOTIFY-2024-UPI-7718293';
+          if (stepApp) stepApp.innerText = 'PhonePe';
+          if (btnUpi) btnUpi.innerHTML = `<span>Open PhonePe &amp; Cancel Subscription</span>`;
+        }
+
+        if (backdrop) backdrop.classList.add('open');
+      }
+
+      static closeCancelSheet() {
+        const backdrop = document.getElementById('modal-cancel-backdrop');
+        if (backdrop) backdrop.classList.remove('open');
+      }
+
+      static completeRevoke() {
+        const btnUpi = document.getElementById('btn-open-upi-app');
+        const badge = document.getElementById('cancel-sheet-badge');
+        const appName = badge ? badge.innerText : 'UPI App';
+
+        if (btnUpi) {
+          const originalText = btnUpi.innerHTML;
+          btnUpi.innerHTML = `<span>Handoff to ${appName} Initiated...</span>`;
+          
+          this.safeTimeout(() => {
+            btnUpi.innerHTML = originalText;
+            this.closeCancelSheet();
+
+            const activeCounter = document.getElementById('metric-active-count');
+            const drainCounter = document.getElementById('metric-monthly-drain');
+            if (activeCounter && activeCounter.innerText === '5') {
+              activeCounter.innerText = '4';
+              activeCounter.classList.add('text-emerald-700', 'scale-110');
+              this.safeTimeout(() => activeCounter.classList.remove('scale-110'), 300);
+            }
+            if (drainCounter && drainCounter.innerText.includes('3435')) {
+              drainCounter.innerText = '₹3,296';
+              drainCounter.classList.add('text-emerald-700', 'scale-110');
+              this.safeTimeout(() => drainCounter.classList.remove('scale-110'), 300);
+            }
+
+            this.showToast(`UMN copied! Switched to ${appName} to revoke mandate.`, '✓');
+          }, 800);
+        } else {
+          this.closeCancelSheet();
+        }
+      }
+
+      static toggleM3Switch(switchId) {
+        const sw = document.getElementById(switchId);
+        if (!sw) return;
+        const thumb = sw.querySelector('.m3-switch-thumb');
+        let enabled = true;
+        if (thumb) {
+          if (thumb.classList.contains('translate-x-4')) {
+            thumb.classList.remove('translate-x-4');
+            thumb.classList.add('translate-x-0');
+            sw.classList.remove('bg-m3-pine');
+            sw.classList.add('bg-slate-300');
+            enabled = false;
+          } else {
+            thumb.classList.remove('translate-x-0');
+            thumb.classList.add('translate-x-4');
+            sw.classList.remove('bg-slate-300');
+            sw.classList.add('bg-m3-pine');
+            enabled = true;
+          }
+        }
+        const names = {
+          'switch-slm': 'Screen Watcher (SLM AI)',
+          'switch-daily': 'Start-of-Day Daily Sync',
+          'switch-alarm': '48-Hour Pre-Debit Alarm',
+          'switch-haptic': 'Haptic Alerts'
+        };
+        const name = names[switchId] || 'Protection Switch';
+        this.showToast(`${name}: ${enabled ? 'Enabled' : 'Disabled'}`, enabled ? '✓' : 'ℹ️');
+      }
+
+      static syncUpiApp(appName) {
+        const idMap = { 'PhonePe': 'app-card-phonepe', 'Google Pay': 'app-card-gpay', 'Paytm': 'app-card-paytm' };
+        const el = document.getElementById(idMap[appName]);
+        if (el) {
+          el.classList.add('scale-95', 'border-m3-pine', 'bg-m3-badgeMint/20');
+          this.safeTimeout(() => el.classList.remove('scale-95', 'border-m3-pine', 'bg-m3-badgeMint/20'), 300);
+        }
+        this.showToast(`${appName} Synced • All AutoPay tokens verified on-device`, '🔄');
+      }
+
+      static clickMetricTile(type) {
+        if (type === 'active') {
+          const section = document.getElementById('active-mandates-section');
+          const scroller = document.getElementById('phone-content-scroller');
+          if (section && scroller) {
+            scroller.scrollTo({ top: section.offsetTop - 10, behavior: 'smooth' });
+          }
+          this.showToast('5 Active Mandates audited across PhonePe, GPay & BHIM', '📋');
+        } else if (type === 'drain') {
+          this.showToast('Monthly Drain: ₹3,435 across 5 subscriptions', '💳');
+        } else if (type === 'traps') {
+          this.showToast('15 Deceptive Traps blocked by SubZero SLM AI', '🛡️');
+        }
+      }
+
+      static clickExposureLimit() {
+        this.showToast('Exposure Limit: ₹5,000 ceiling. Current: ₹3,435 (68% utilized)', '🛡️');
+      }
+
+      static setupManualInteractivity() {
+        // App cards are attached via direct onclick in HTML
+      }
+    }
+
+
+    /**
+     * CLASS: WalkthroughEngine
+     * Auto-pilot timeline manager with Two-Way Manual Override and State Machine.
+     */
+    class WalkthroughEngine {
+      constructor(narrationCtrl) {
+        this.narration = narrationCtrl;
+        this.isPlaying = false;
+        this.isPaused = false;
+        this.currentStep = 0;
+        this.totalSteps = 7;
+        this.abortController = null;
+        this.timerInterval = null;
+        this.elapsedSeconds = 0;
+
+        this.phoneViewport = document.getElementById('phone-screen-viewport');
+        this.phoneScroller = document.getElementById('phone-content-scroller');
+        this.progressBar = document.getElementById('timeline-progress-bar');
+        this.labelStepTitle = document.getElementById('label-step-title');
+        this.labelStepTimer = document.getElementById('label-step-timer');
+        this.btnPause = document.getElementById('btn-pause-resume');
+        this.textPause = document.getElementById('text-pause');
+
+        this.stepsData = [
+          {
+            index: 1,
+            title: "1. Intro & Hub",
+            narration: "Welcome to SubZero, the on-device guardian protecting users from deceptive subscription traps and fragmented UPI AutoPays.",
+            duration: 7000
+          },
+          {
+            index: 2,
+            title: "2. Paywall Trap",
+            narration: "Utility apps often trick users with 3-day free trials that mask recurring monthly charges. Let's inspect a paywall in DocuScan Pro.",
+            duration: 8000
+          },
+          {
+            index: 3,
+            title: "3. SLM Intercept",
+            narration: "Before the user can tap, SubZero's local SLM analyzes the screen hierarchy in under 200 milliseconds, detecting the hidden 899 rupee monthly debit.",
+            duration: 9000
+          },
+          {
+            index: 4,
+            title: "4. App Discovery",
+            narration: "Back on the dashboard, SubZero organizes all recurring commitments across PhonePe, Google Pay, and Paytm without cloud access.",
+            duration: 8500
+          },
+          {
+            index: 5,
+            title: "5. Price Hikes",
+            narration: "SubZero continuously monitors regulatory alerts. Notice Netflix flagged with a price hike badge from 499 to 649 rupees.",
+            duration: 8500
+          },
+          {
+            index: 6,
+            title: "6. Revocation",
+            narration: "To cancel, SubZero provides one-tap assisted revocation. Tapping stop copies the UMN and prepares direct handoff to PhonePe.",
+            duration: 9000
+          },
+          {
+            index: 7,
+            title: "7. Conclusion",
+            narration: "Zero cloud, zero tracking, total control over your recurring finances. Explore SubZero manually now.",
+            duration: 6000
+          }
+        ];
+
+        this.bindEvents();
+      }
+
+      bindEvents() {
+        // Master button with full state machine
+        const masterBtn = document.getElementById('btn-master-walkthrough');
+        if (masterBtn) {
+          masterBtn.addEventListener('click', () => {
+            this.toggleMasterWalkthrough();
+          });
+        }
+
+        // Secondary Pause/Resume button
+        if (this.btnPause) {
+          this.btnPause.addEventListener('click', () => {
+            if (this.isPlaying) {
+              this.pauseTour();
+            } else {
+              this.resumeTour();
+            }
+          });
+        }
+
+        // Restart button
+        const btnRestart = document.getElementById('btn-restart-walkthrough');
+        if (btnRestart) {
+          btnRestart.addEventListener('click', () => {
+            this.elapsedSeconds = 0;
+            this.startTour(1);
+          });
+        }
+
+        // Step chips click
+        document.querySelectorAll('.step-chip').forEach(chip => {
+          chip.addEventListener('click', () => {
+            const stepNum = parseInt(chip.getAttribute('data-step'), 10);
+            if (!isNaN(stepNum)) {
+              this.jumpToStep(stepNum);
+            }
+          });
+        });
+
+        // Voice toggle
+        const btnVoice = document.getElementById('btn-toggle-voice');
+        if (btnVoice) {
+          btnVoice.addEventListener('click', () => {
+            this.narration.toggleMute();
+          });
+        }
+
+        // TWO-WAY MANUAL OVERRIDE: Touching or clicking the phone stops auto-pilot and gives complete interactive access
+        if (this.phoneViewport) {
+          this.phoneViewport.addEventListener('pointerdown', (e) => {
+            if (this.isPlaying) {
+              this.yieldToManualControl();
+            }
+          }, { capture: true });
+        }
+      }
+
+      yieldToManualControl() {
+        if (!this.isPlaying) return;
+        this.pauseTour();
+        SubZeroShowcase.showToast('Manual mode active — explore freely!', '🎮');
+        if (this.labelStepTitle) {
+          this.labelStepTitle.innerText = `Manual Mode Active • Step ${this.currentStep || 1}/7`;
+        }
+      }
+
+      pauseTour() {
+        this.stopTour(true);
+      }
+
+      resumeTour() {
+        if (this.isPlaying) return;
+        const stepToResume = (this.currentStep >= 1 && this.currentStep <= 7) ? this.currentStep : 1;
+        this.startTour(stepToResume);
+      }
+
+      toggleMasterWalkthrough() {
+        if (this.isPlaying) {
+          this.pauseTour();
+        } else {
+          this.resumeTour();
+        }
+      }
+
+      updateMasterBtnUI(state) {
+        const title = document.getElementById('master-btn-title');
+        const icon = document.getElementById('master-btn-icon');
+        const badge = document.querySelector('#btn-master-walkthrough .font-mono');
+        const launchText = document.querySelector('#btn-master-walkthrough .sm\\:flex span');
+        const iconPause = document.getElementById('icon-pause');
+
+        if (state === 'playing') {
+          if (title) title.innerText = 'PAUSE WALKTHROUGH';
+          if (icon) icon.innerHTML = '<rect x="6" y="4" width="4" height="16" fill="currentColor"></rect><rect x="14" y="4" width="4" height="16" fill="currentColor"></rect>';
+          if (badge) {
+            badge.innerText = 'RUNNING';
+            badge.className = 'px-1.5 py-0.2 text-[9px] font-mono rounded bg-emerald-400/20 text-emerald-300 border border-emerald-400/30';
+          }
+          if (launchText) launchText.innerText = 'Pause';
+          if (this.textPause) this.textPause.innerText = 'Pause';
+          if (iconPause) iconPause.innerHTML = '<rect x="6" y="4" width="4" height="16" fill="currentColor"></rect><rect x="14" y="4" width="4" height="16" fill="currentColor"></rect>';
+        } else if (state === 'paused' || state === 'stopped' || state === 'manual') {
+          if (title) title.innerText = 'RESUME WALKTHROUGH';
+          if (icon) icon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3" fill="currentColor"></polygon>';
+          if (badge) {
+            badge.innerText = 'PAUSED';
+            badge.className = 'px-1.5 py-0.2 text-[9px] font-mono rounded bg-amber-400/20 text-amber-300 border border-amber-400/30';
+          }
+          if (launchText) launchText.innerText = 'Resume';
+          if (this.textPause) this.textPause.innerText = 'Resume';
+          if (iconPause) iconPause.innerHTML = '<polygon points="5 3 19 12 5 21 5 3" fill="currentColor"></polygon>';
+        } else {
+          if (title) title.innerText = 'PROCEED WALKTHROUGH';
+          if (icon) icon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3" fill="currentColor"></polygon>';
+          if (badge) {
+            badge.innerText = 'AUTO-PILOT';
+            badge.className = 'px-1.5 py-0.2 text-[9px] font-mono rounded bg-emerald-400/20 text-emerald-300 border border-emerald-400/30';
+          }
+          if (launchText) launchText.innerText = 'Launch';
+          if (this.textPause) this.textPause.innerText = 'Pause';
+          if (iconPause) iconPause.innerHTML = '<rect x="6" y="4" width="4" height="16" fill="currentColor"></rect><rect x="14" y="4" width="4" height="16" fill="currentColor"></rect>';
+        }
+      }
+
+      startTimerTicker() {
+        if (this.timerInterval) clearInterval(this.timerInterval);
+        this.timerInterval = setInterval(() => {
+          if (!this.isPlaying) {
+            clearInterval(this.timerInterval);
+            return;
+          }
+          this.elapsedSeconds++;
+          if (this.labelStepTimer) {
+            this.labelStepTimer.innerText = `${Math.min(58, this.elapsedSeconds)}s / 58s`;
+          }
+        }, 1000);
+      }
+
+      startTour(fromStep = 1) {
+        this.stopTour(false);
+        this.isPlaying = true;
+        this.isPaused = false;
+        this.currentStep = fromStep;
+        this.updateMasterBtnUI('playing');
+        this.startTimerTicker();
+
+        this.abortController = new AbortController();
+        const signal = this.abortController.signal;
+
+        (async () => {
+          try {
+            for (let i = fromStep - 1; i < this.stepsData.length; i++) {
+              if (signal.aborted) return;
+              this.currentStep = i + 1;
+              this.updateStepUI(this.currentStep);
+              await this.executeStep(this.stepsData[i], signal);
+              if (signal.aborted) return;
+            }
+            if (!signal.aborted) this.finish();
+          } catch (e) {
+            // Tour stopped/aborted cleanly
+          }
+        })();
+      }
+
+      stopTour(markAsPaused = true) {
+        if (this.abortController) {
+          this.abortController.abort();
+          this.abortController = null;
+        }
+        this.isPlaying = false;
+        this.isPaused = markAsPaused;
+
+        if (this.timerInterval) {
+          clearInterval(this.timerInterval);
+          this.timerInterval = null;
+        }
+
+        if (this.narration) this.narration.stop();
+        if (window.speechSynthesis) {
+          try {
+            window.speechSynthesis.pause();
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.resume();
+          } catch (e) {}
+        }
+
+        SubZeroShowcase.clearPendingTimeouts();
+        this.clearHighlights();
+
+        this.updateMasterBtnUI(markAsPaused ? 'paused' : 'idle');
+        if (markAsPaused) {
+          SubZeroShowcase.showToast('Walkthrough stopped • Explore freely', '⏸️');
+          if (this.labelStepTitle) {
+            this.labelStepTitle.innerText = `Paused at Step ${this.currentStep || 1}/7 • Click Resume anytime`;
+          }
+        }
+      }
+
+      jumpToStep(stepNumber) {
+        const step = this.stepsData[stepNumber - 1];
+        if (step) {
+          const priorDurations = this.stepsData.slice(0, stepNumber - 1).reduce((acc, s) => acc + s.duration, 0);
+          this.elapsedSeconds = Math.round(priorDurations / 1000);
+          if (this.labelStepTimer) {
+            this.labelStepTimer.innerText = `${this.elapsedSeconds}s / 58s`;
+          }
+        }
+        this.startTour(stepNumber);
+      }
+
+      finish() {
+        this.isPlaying = false;
+        this.isPaused = false;
+        if (this.timerInterval) {
+          clearInterval(this.timerInterval);
+          this.timerInterval = null;
+        }
+        this.clearHighlights();
+        this.updateMasterBtnUI('idle');
+        if (this.labelStepTitle) this.labelStepTitle.innerText = 'Tour Complete • Explore Freely';
+        if (this.labelStepTimer) this.labelStepTimer.innerText = '58s / 58s';
+        if (this.progressBar) this.progressBar.style.width = '100%';
+        SubZeroShowcase.showToast('Walkthrough complete! Feel free to test every control.', '🎉');
+      }
+
+      updateStepUI(stepNum) {
+        const step = this.stepsData[stepNum - 1];
+        if (this.labelStepTitle && step) {
+          this.labelStepTitle.innerText = `Step ${stepNum}/7: ${step.title.split('. ')[1]}`;
+        }
+        
+        const pct = ((stepNum - 1) / (this.totalSteps - 1)) * 100;
+        if (this.progressBar) {
+          this.progressBar.style.width = `${Math.max(14, pct)}%`;
+        }
+
+        document.querySelectorAll('.step-chip').forEach(chip => {
+          const chipStep = parseInt(chip.getAttribute('data-step'), 10);
+          if (chipStep === stepNum) {
+            chip.classList.remove('bg-white/5', 'text-slate-400');
+            chip.classList.add('bg-m3-pineContainer', 'text-m3-pine', 'border-m3-pine');
+          } else {
+            chip.classList.add('bg-white/5', 'text-slate-400');
+            chip.classList.remove('bg-m3-pineContainer', 'text-m3-pine', 'border-m3-pine');
+          }
+        });
+      }
+
+      async wait(ms, signal) {
+        const start = Date.now();
+        while (Date.now() - start < ms) {
+          if (signal && signal.aborted) throw new Error('Aborted');
+          await new Promise(r => setTimeout(r, 40));
+        }
+      }
+
+      triggerSimulatedPress(element) {
+        if (!element) return;
+        element.classList.add('simulated-active-press');
+        SubZeroShowcase.safeTimeout(() => element.classList.remove('simulated-active-press'), 220);
+      }
+
+      clearHighlights() {
+        document.querySelectorAll('.pulse-glow-pine, .pulse-glow-coral, .simulated-active-press').forEach(el => {
+          el.classList.remove('pulse-glow-pine', 'pulse-glow-coral', 'simulated-active-press');
+        });
+      }
+
+      async executeStep(step, signal) {
+        if (signal && signal.aborted) return;
+        this.clearHighlights();
+
+        switch (step.index) {
+          case 1: {
+            SubZeroShowcase.showDashboard();
+            if (this.phoneScroller) this.phoneScroller.scrollTo({ top: 0, behavior: 'smooth' });
+
+            const tileActive = document.getElementById('tile-active-mandates');
+            const tileDrain = document.getElementById('tile-monthly-drain');
+            if (tileActive) tileActive.classList.add('pulse-glow-pine');
+            if (tileDrain) tileDrain.classList.add('pulse-glow-pine');
+
+            await this.wait(400, signal);
+            if (signal.aborted) return;
+            this.triggerSimulatedPress(tileDrain);
+            
+            await this.narration.speak(step.narration, step.duration, signal);
+            if (signal.aborted) return;
+            break;
+          }
+
+          case 2: {
+            if (signal.aborted) return;
+            SubZeroShowcase.showPaywall();
+            await this.wait(500, signal);
+            if (signal.aborted) return;
+
+            const ctaBtn = document.getElementById('btn-paywall-cta');
+            const finePrint = document.getElementById('paywall-hidden-fineprint');
+            
+            if (finePrint) finePrint.classList.add('pulse-glow-coral');
+            if (ctaBtn) this.triggerSimulatedPress(ctaBtn);
+
+            await this.narration.speak(step.narration, step.duration, signal);
+            if (signal.aborted) return;
+            break;
+          }
+
+          case 3: {
+            if (signal.aborted) return;
+            const ctaBtn = document.getElementById('btn-paywall-cta');
+            if (ctaBtn) this.triggerSimulatedPress(ctaBtn);
+
+            SubZeroShowcase.triggerIntercept();
+            await this.wait(800, signal);
+            if (signal.aborted) return;
+
+            const blockBtn = document.getElementById('btn-block-trap');
+            if (blockBtn) this.triggerSimulatedPress(blockBtn);
+
+            await this.narration.speak(step.narration, step.duration, signal);
+            if (signal.aborted) return;
+
+            if (blockBtn) {
+              SubZeroShowcase.blockAndExitTrap();
+            }
+            break;
+          }
+
+          case 4: {
+            if (signal.aborted) return;
+            SubZeroShowcase.showDashboard();
+            if (this.phoneScroller) this.phoneScroller.scrollTo({ top: 90, behavior: 'smooth' });
+            await this.wait(400, signal);
+            if (signal.aborted) return;
+
+            const phonePeCard = document.getElementById('app-card-phonepe');
+            if (phonePeCard) {
+              phonePeCard.classList.add('pulse-glow-pine');
+              this.triggerSimulatedPress(phonePeCard);
+            }
+
+            await this.narration.speak(step.narration, step.duration, signal);
+            if (signal.aborted) return;
+            break;
+          }
+
+          case 5: {
+            if (signal.aborted) return;
+            SubZeroShowcase.showDashboard();
+            const streamCard = document.getElementById('mandate-card-streamvibe');
+            if (this.phoneScroller && streamCard) {
+              this.phoneScroller.scrollTo({ top: streamCard.offsetTop - 50, behavior: 'smooth' });
+            }
+            await this.wait(500, signal);
+            if (signal.aborted) return;
+
+            if (streamCard) {
+              streamCard.classList.add('pulse-glow-pine');
+              this.triggerSimulatedPress(streamCard);
+            }
+
+            await this.narration.speak(step.narration, step.duration, signal);
+            if (signal.aborted) return;
+            break;
+          }
+
+          case 6: {
+            if (signal.aborted) return;
+            SubZeroShowcase.showDashboard();
+            const stopSpotifyBtn = document.getElementById('btn-stop-spotify');
+            const spotifyCard = document.getElementById('mandate-card-spotify');
+            
+            if (this.phoneScroller && spotifyCard) {
+              this.phoneScroller.scrollTo({ top: spotifyCard.offsetTop - 60, behavior: 'smooth' });
+            }
+            await this.wait(400, signal);
+            if (signal.aborted) return;
+
+            if (stopSpotifyBtn) {
+              this.triggerSimulatedPress(stopSpotifyBtn);
+              SubZeroShowcase.openCancelSheet('Spotify');
+            }
+
+            await this.wait(600, signal);
+            if (signal.aborted) return;
+            const openAppBtn = document.getElementById('btn-open-upi-app');
+            if (openAppBtn) {
+              openAppBtn.classList.add('pulse-glow-pine');
+              this.triggerSimulatedPress(openAppBtn);
+            }
+
+            await this.narration.speak(step.narration, step.duration, signal);
+            if (signal.aborted) return;
+            break;
+          }
+
+          case 7: {
+            if (signal.aborted) return;
+            SubZeroShowcase.closeCancelSheet();
+            await this.wait(350, signal);
+            if (signal.aborted) return;
+            if (this.phoneScroller) this.phoneScroller.scrollTo({ top: 0, behavior: 'smooth' });
+
+            await this.narration.speak(step.narration, step.duration, signal);
+            break;
+          }
+        }
+      }
+    }
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const narrationController = new NarrationController();
+      const walkthroughEngine = new WalkthroughEngine(narrationController);
+
+      window.SubZeroShowcase = SubZeroShowcase;
+      window.narrationController = narrationController;
+      window.walkthroughEngine = walkthroughEngine;
+
+      SubZeroShowcase.setupManualInteractivity();
+    });
+  </script>
+
+</body>
+</html>
