@@ -181,27 +181,30 @@
       }
     }
 
-    /* Soundwave animation (paused by default) */
-    .soundwave-bar {
-      width: 2.5px;
-      height: 4px;
-      border-radius: 9999px;
-      background: #CBE7DD;
-      animation: soundwave-bounce 0.75s ease-in-out infinite alternate;
-      animation-play-state: paused;
+    /* Real-Time Centered Voice Visualizer */
+    #soundwave-anim {
+      display: flex;
+      align-items: center; /* Centers dots vertically with the text */
+      gap: 3px;
+      height: 16px; /* Provides vertical expansion room */
     }
 
+    .soundwave-bar {
+      width: 3.5px;
+      height: 3.5px; /* Resting state: 4 identical, uniform circular dots */
+      border-radius: 9999px;
+      background-color: #8FAFA3;
+      transition: height 0.12s cubic-bezier(0.2, 0.8, 0.4, 1), 
+                  background-color 0.15s ease,
+                  transform 0.12s ease;
+      transform-origin: center;
+      flex-shrink: 0;
+    }
+
+    /* Active speech accent color */
     #soundwave-anim.speaking .soundwave-bar {
-      animation-play-state: running;
+      background-color: #CBE7DD;
     }
-    @keyframes soundwave-bounce {
-      0% { height: 4px; }
-      100% { height: 18px; }
-    }
-    .soundwave-bar:nth-child(2) { animation-delay: 0.12s; }
-    .soundwave-bar:nth-child(3) { animation-delay: 0.3s; }
-    .soundwave-bar:nth-child(4) { animation-delay: 0.22s; }
-    .soundwave-bar:nth-child(5) { animation-delay: 0.4s; }
 
     /* Focus pulse glow */
     .pulse-glow-pine {
@@ -403,11 +406,11 @@
           <div class="p-2.5 rounded-xl bg-black/40 border border-white/10">
             <div class="flex items-center justify-between pb-1 mb-1 border-b border-white/5">
               <div class="flex items-center gap-1.5">
-                <div class="flex items-end gap-0.5 h-3.5 opacity-30 transition-opacity duration-300" id="soundwave-anim">
-                  <span class="soundwave-bar"></span>
-                  <span class="soundwave-bar"></span>
-                  <span class="soundwave-bar"></span>
-                  <span class="soundwave-bar"></span>
+                <div class="flex items-center gap-[3px] h-4" id="soundwave-anim">
+                  <span class="soundwave-bar" id="v-dot-1"></span>
+                  <span class="soundwave-bar" id="v-dot-2"></span>
+                  <span class="soundwave-bar" id="v-dot-3"></span>
+                  <span class="soundwave-bar" id="v-dot-4"></span>
                 </div>
                 <span class="text-[10px] font-mono uppercase tracking-wider text-m3-pineContainer font-semibold">Live Speech Transcript</span>
               </div>
@@ -1101,8 +1104,45 @@
         this.captionElement = document.getElementById('live-caption-text');
         this.soundwaveAnim = document.getElementById('soundwave-anim');
         this.speakerBadge = document.getElementById('speaker-badge');
+        this._collapseTimer = null;
+        this._livePulseInterval = null;
 
         this.initVoices();
+      }
+
+      pulseVisualizer() {
+        const bars = [
+          document.getElementById('v-dot-1'),
+          document.getElementById('v-dot-2'),
+          document.getElementById('v-dot-3'),
+          document.getElementById('v-dot-4')
+        ];
+        if (!bars[0]) return;
+
+        // Generate dynamic, vocal-like amplitude heights centered around the middle
+        const heights = [
+          Math.floor(Math.random() * 8 + 6),   // 6px - 14px
+          Math.floor(Math.random() * 10 + 8),  // 8px - 18px (dominant core)
+          Math.floor(Math.random() * 8 + 7),   // 7px - 15px
+          Math.floor(Math.random() * 6 + 5)    // 5px - 11px
+        ];
+
+        bars.forEach((bar, index) => {
+          if (bar) bar.style.height = `${heights[index]}px`;
+        });
+
+        // Smoothly collapse back to 4 identical 3.5px dots after word finishes
+        clearTimeout(this._collapseTimer);
+        this._collapseTimer = setTimeout(() => {
+          this.resetVisualizerToDots();
+        }, 140);
+      }
+
+      resetVisualizerToDots() {
+        for (let i = 1; i <= 4; i++) {
+          const dot = document.getElementById(`v-dot-${i}`);
+          if (dot) dot.style.height = '3.5px';
+        }
       }
 
       initVoices() {
@@ -1169,8 +1209,8 @@
           }
           if (this.soundwaveAnim) {
             this.soundwaveAnim.classList.remove('speaking');
-            this.soundwaveAnim.style.opacity = '0.3';
           }
+          this.resetVisualizerToDots();
         } else {
           if (textVolume) textVolume.innerText = 'Narration: ON';
           if (iconVolume) {
@@ -1187,15 +1227,30 @@
 
         return new Promise((resolve) => {
           let hasFinished = false;
+          let livePulseInterval = null;
 
           const finish = () => {
             if (hasFinished) return;
             hasFinished = true;
+            if (livePulseInterval) {
+              clearInterval(livePulseInterval);
+              livePulseInterval = null;
+            }
+            if (this._livePulseInterval) {
+              clearInterval(this._livePulseInterval);
+              this._livePulseInterval = null;
+            }
+            clearTimeout(this._collapseTimer);
+            this.resetVisualizerToDots();
+            if (this.soundwaveAnim) {
+              this.soundwaveAnim.classList.remove('speaking');
+            }
             if (this.activeTimeout) {
               clearTimeout(this.activeTimeout);
               this.activeTimeout = null;
             }
             if (this.activeUtterance) {
+              this.activeUtterance.onboundary = null;
               this.activeUtterance.onend = null;
               this.activeUtterance.onerror = null;
               this.activeUtterance = null;
@@ -1204,10 +1259,6 @@
               signal.removeEventListener('abort', onAbort);
             }
             this.activeResolve = null;
-            if (this.soundwaveAnim) {
-              this.soundwaveAnim.classList.remove('speaking');
-              this.soundwaveAnim.style.opacity = '0.3';
-            }
             resolve();
           };
 
@@ -1239,8 +1290,8 @@
           if (this.isMuted || !this.synth) {
             if (this.soundwaveAnim) {
               this.soundwaveAnim.classList.remove('speaking');
-              this.soundwaveAnim.style.opacity = '0.3';
             }
+            this.resetVisualizerToDots();
             const t = setTimeout(finish, Math.min(expectedDurationMs, 6000));
             this.activeTimeout = t;
             return;
@@ -1248,7 +1299,6 @@
 
           if (this.soundwaveAnim) {
             this.soundwaveAnim.classList.add('speaking');
-            this.soundwaveAnim.style.opacity = '1';
           }
 
           try {
@@ -1266,6 +1316,23 @@
             utter.onend = finish;
             utter.onerror = finish;
 
+            // Trigger real-time pulses whenever a word or syllable boundary is spoken
+            utter.onboundary = (event) => {
+              if (this.isMuted) return;
+              this.pulseVisualizer();
+            };
+
+            // Fallback interval for platforms where onboundary events fire sparsely
+            livePulseInterval = setInterval(() => {
+              if (this.synth && this.synth.speaking && !this.isMuted && !this.synth.paused) {
+                this.pulseVisualizer();
+              } else {
+                clearInterval(livePulseInterval);
+                livePulseInterval = null;
+              }
+            }, 160);
+            this._livePulseInterval = livePulseInterval;
+
             this.activeTimeout = setTimeout(finish, expectedDurationMs + 1000);
             this.activeUtterance = utter;
             this.synth.speak(utter);
@@ -1276,6 +1343,15 @@
       }
 
       stop() {
+        if (this._livePulseInterval) {
+          clearInterval(this._livePulseInterval);
+          this._livePulseInterval = null;
+        }
+        if (this._collapseTimer) {
+          clearTimeout(this._collapseTimer);
+          this._collapseTimer = null;
+        }
+        this.resetVisualizerToDots();
         if (this.activeTimeout) {
           clearTimeout(this.activeTimeout);
           this.activeTimeout = null;
@@ -1294,7 +1370,6 @@
         }
         if (this.soundwaveAnim) {
           this.soundwaveAnim.classList.remove('speaking');
-          this.soundwaveAnim.style.opacity = '0.3';
         }
       }
     }
