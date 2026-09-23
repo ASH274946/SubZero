@@ -532,18 +532,18 @@
                   </button>
                 </div>
 
-                <!-- Centered 3 Metric Tiles (Active 3, Monthly Drain ₹2137, Blocked 15) -->
+                <!-- Centered 3 Metric Tiles (Active 4, Monthly Drain ₹2,786, Blocked 15) -->
                 <div class="grid grid-cols-3 gap-2" id="metric-tiles-group">
-                  <!-- Active: 3 -->
+                  <!-- Active: 4 -->
                   <div class="bg-white py-2.5 px-1.5 rounded-[20px] shadow-sm border border-m3-variant flex flex-col items-center justify-center text-center transition-all duration-300 cursor-pointer hover:border-m3-pine/50 active:scale-95" id="tile-active-mandates" onclick="SubZeroShowcase.clickMetricTile('active')">
                     <span class="text-[10.5px] font-medium text-m3-textSecondary">Active</span>
-                    <span class="text-[22px] font-extrabold text-m3-textPrimary mt-0.5 tracking-tight" id="metric-active-count">3</span>
+                    <span class="text-[22px] font-extrabold text-m3-textPrimary mt-0.5 tracking-tight" id="metric-active-count">4</span>
                   </div>
 
-                  <!-- Monthly Drain: ₹2137 -->
+                  <!-- Monthly Drain: ₹2,786 -->
                   <div class="bg-white py-2.5 px-1.5 rounded-[20px] shadow-sm border border-m3-variant flex flex-col items-center justify-center text-center transition-all duration-300 cursor-pointer hover:border-m3-pine/50 active:scale-95" id="tile-monthly-drain" onclick="SubZeroShowcase.clickMetricTile('drain')">
                     <span class="text-[10.5px] font-medium text-m3-textSecondary">Monthly Drain</span>
-                    <span class="text-[22px] font-extrabold text-m3-textPrimary mt-0.5 tracking-tight" id="metric-monthly-drain">₹2137</span>
+                    <span class="text-[22px] font-extrabold text-m3-textPrimary mt-0.5 tracking-tight" id="metric-monthly-drain">₹2,786</span>
                   </div>
 
                   <!-- Blocked Traps: 15 -->
@@ -592,11 +592,11 @@
                         <div class="w-7 h-7 rounded-full bg-[#5F259F] flex items-center justify-center text-white font-bold text-xs shadow-sm">
                           पे
                         </div>
-                        <span class="w-4 h-4 rounded-full bg-m3-pineContainer text-m3-pine text-[9px] font-bold flex items-center justify-center">1</span>
+                        <span class="w-4 h-4 rounded-full bg-m3-pineContainer text-m3-pine text-[9px] font-bold flex items-center justify-center">2</span>
                       </div>
                       <div>
                         <div class="font-bold text-[12px] text-m3-textPrimary leading-tight truncate">PhonePe</div>
-                        <div class="text-[9.5px] text-m3-textSecondary">1 AutoPay</div>
+                        <div class="text-[9.5px] text-m3-textSecondary">2 AutoPays</div>
                       </div>
                     </div>
 
@@ -738,7 +738,7 @@
                 <div class="space-y-2 pt-1" id="active-mandates-section">
                   <div class="flex items-center justify-between px-0.5">
                     <h3 class="text-[15px] font-bold text-m3-textPrimary">Active Mandates</h3>
-                    <span class="text-[11px] text-m3-textSecondary font-medium" id="label-indexed-count">3 Indexed</span>
+                    <span class="text-[11px] text-m3-textSecondary font-medium" id="label-indexed-count">4 Indexed</span>
                   </div>
 
                   <!-- Mandate Card 1: Spotify (Screenshot 1) -->
@@ -768,6 +768,47 @@
                         <span>Renews in 5 days</span>
                       </div>
                       <button id="btn-stop-spotify" class="px-3 py-1 rounded-full bg-m3-alertCoralContainer text-m3-alertCoral hover:bg-m3-alertCoral hover:text-white font-bold text-[11px] transition-all" onclick="SubZeroShowcase.openCancelSheet('Spotify')">
+                        Stop in PhonePe
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Mandate Card: Netflix (With Regulatory Price Hike Badge) -->
+                  <div class="bg-white p-3.5 rounded-[22px] shadow-sm border border-m3-variant space-y-3 transition-all duration-300 relative overflow-hidden" id="mandate-card-netflix">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-2.5">
+                        <!-- Netflix Logo Badge -->
+                        <div class="w-9 h-9 rounded-full bg-[#E50914] text-white flex items-center justify-center font-black text-base shadow-sm">
+                          N
+                        </div>
+                        <div>
+                          <div class="flex items-center gap-1.5">
+                            <h4 class="font-bold text-[14px] text-m3-textPrimary leading-tight">Netflix</h4>
+                            <!-- Regulatory Price Hike Pill Badge -->
+                            <span class="px-1.5 py-[1.5px] rounded-full bg-m3-alertCoralContainer text-m3-alertCoral text-[7.5px] font-bold tracking-tight uppercase inline-flex items-center gap-0.5 whitespace-nowrap leading-none shrink-0">
+                              <svg class="w-2 h-2 fill-current shrink-0" viewBox="0 0 24 24"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>
+                              <span>Hike: Was ₹499</span>
+                            </span>
+                          </div>
+                          <div class="flex items-center gap-1 text-[10.5px] text-m3-textSecondary mt-0.5">
+                            <span>Active in:</span>
+                            <span class="font-bold text-m3-pine">PhonePe</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <div class="font-extrabold text-[15px] text-m3-alertCoral">₹649/mo</div>
+                        <div class="text-[9px] text-slate-400 line-through">₹499/mo</div>
+                      </div>
+                    </div>
+
+                    <!-- Bottom Action Row -->
+                    <div class="flex items-center justify-between pt-1">
+                      <div class="px-2.5 py-1 rounded-full bg-m3-alertCoralContainer text-m3-alertCoral text-[10px] font-bold flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span>Debits Tomorrow</span>
+                      </div>
+                      <button id="btn-stop-netflix" class="px-3 py-1 rounded-full bg-m3-alertCoralContainer text-m3-alertCoral hover:bg-m3-alertCoral hover:text-white font-bold text-[11px] active:scale-95 transition-all cursor-pointer" onclick="SubZeroShowcase.openCancelSheet('Netflix')">
                         Stop in PhonePe
                       </button>
                     </div>
@@ -1073,10 +1114,40 @@
         const populate = () => {
           try {
             const voices = this.synth.getVoices();
-            this.selectedVoice = voices.find(v => 
-              v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('David'))
-            ) || voices.find(v => v.lang.startsWith('en')) || voices[0];
-          } catch (e) {}
+            if (!voices || voices.length === 0) return;
+
+            // Filter out robotic legacy desktop SAPI engines
+            const validVoices = voices.filter(v => {
+              const name = v.name.toLowerCase();
+              return !name.includes('desktop') && 
+                     !name.includes('david') && 
+                     !name.includes('mark') && 
+                     !name.includes('george') && 
+                     !name.includes('zira');
+            });
+
+            // Target Priority: Jenny Natural -> Google US English -> Apple Natural/Samantha
+            const chosen = 
+              validVoices.find(v => v.name.includes('Jenny') && v.name.includes('Natural')) ||
+              validVoices.find(v => v.name.toLowerCase().includes('google us english')) ||
+              validVoices.find(v => v.name.includes('Aria') && v.name.includes('Natural')) ||
+              validVoices.find(v => v.name.toLowerCase().includes('samantha')) ||
+              validVoices.find(v => v.lang.startsWith('en')) ||
+              voices[0];
+
+            this.selectedVoice = chosen;
+
+            if (this.speakerBadge && this.selectedVoice) {
+              const cleanName = this.selectedVoice.name
+                .replace('Microsoft ', '')
+                .replace(' Online (Natural)', '')
+                .replace(' English', '')
+                .replace(' (United States)', '');
+              this.speakerBadge.innerText = cleanName;
+            }
+          } catch (e) {
+            console.warn('Voice initialization error:', e);
+          }
         };
 
         populate();
@@ -1188,8 +1259,8 @@
 
             const utter = new SpeechSynthesisUtterance(text);
             if (this.selectedVoice) utter.voice = this.selectedVoice;
-            utter.rate = 1.02;
-            utter.pitch = 1.0;
+            utter.rate = 1.03;
+            utter.pitch = 1.06;
             utter.lang = 'en-US';
 
             utter.onend = finish;
@@ -1408,7 +1479,13 @@
         const btnUpi = document.getElementById('btn-open-upi-app');
         const stepApp = document.getElementById('cancel-step-app-1');
 
-        if (merchant.includes('Google') || merchant.includes('StreamVibe')) {
+        if (merchant.includes('Netflix')) {
+          if (title) title.innerText = 'Cancel Netflix';
+          if (badge) badge.innerText = 'PhonePe';
+          if (umn) umn.innerText = 'UMN: NETFLIX-IN-2024-HIKE-94182';
+          if (stepApp) stepApp.innerText = 'PhonePe';
+          if (btnUpi) btnUpi.innerHTML = `<span>Open PhonePe &amp; Cancel Subscription</span>`;
+        } else if (merchant.includes('Google') || merchant.includes('StreamVibe')) {
           if (title) title.innerText = 'Cancel StreamVibe HD';
           if (badge) badge.innerText = 'Google Pay';
           if (umn) umn.innerText = 'UMN: STREAM-HD-9921-GPAY';
@@ -1464,7 +1541,10 @@
             let cardId = 'mandate-card-spotify';
             let drainAmount = 139;
 
-            if (merchant.includes('Google') || merchant.includes('StreamVibe')) {
+            if (merchant.includes('Netflix')) {
+              cardId = 'mandate-card-netflix';
+              drainAmount = 649;
+            } else if (merchant.includes('Google') || merchant.includes('StreamVibe')) {
               cardId = 'mandate-card-streamvibe';
               drainAmount = 1199;
             } else if (merchant.includes('Broadband') || merchant.includes('BHIM')) {
@@ -1487,9 +1567,9 @@
 
             const drainCounter = document.getElementById('metric-monthly-drain');
             if (drainCounter) {
-              const currentVal = parseInt(drainCounter.innerText.replace(/[^0-9]/g, '')) || 2137;
+              const currentVal = parseInt(drainCounter.innerText.replace(/[^0-9]/g, '')) || 2786;
               const newVal = Math.max(0, currentVal - drainAmount);
-              drainCounter.innerText = `₹${newVal}`;
+              drainCounter.innerText = `₹${newVal.toLocaleString('en-IN')}`;
               drainCounter.classList.add('text-emerald-700', 'scale-110');
               this.safeTimeout(() => drainCounter.classList.remove('scale-110'), 300);
             }
@@ -1571,10 +1651,10 @@
           if (section && scroller) {
             scroller.scrollTo({ top: section.offsetTop - 10, behavior: 'smooth' });
           }
-          const activeCount = document.getElementById('metric-active-count')?.innerText || '3';
+          const activeCount = document.getElementById('metric-active-count')?.innerText || '4';
           this.showToast(`${activeCount} Active Mandates audited across PhonePe, GPay & BHIM`, '📋');
         } else if (type === 'drain') {
-          const drain = document.getElementById('metric-monthly-drain')?.innerText || '₹2137';
+          const drain = document.getElementById('metric-monthly-drain')?.innerText || '₹2,786';
           this.showToast(`Monthly Drain: ${drain} across active subscriptions`, '💳');
         } else if (type === 'traps') {
           this.showToast('15 Deceptive Traps blocked by SubZero SLM AI', '🛡️');
@@ -1809,7 +1889,7 @@
           document.querySelectorAll('#active-mandates-section [id^="mandate-card-"]').forEach(c => c.classList.remove('hidden'));
           SubZeroShowcase.updateActiveMandatesCount();
           const drain = document.getElementById('metric-monthly-drain');
-          if (drain) drain.innerText = '₹2137';
+          if (drain) drain.innerText = '₹2,786';
         }
         this.updateMasterBtnUI('playing');
         this.startTimerTicker();
@@ -2019,16 +2099,17 @@
           case 5: {
             if (signal.aborted) return;
             SubZeroShowcase.showDashboard();
-            const streamCard = document.getElementById('mandate-card-streamvibe');
-            if (this.phoneScroller && streamCard) {
-              this.phoneScroller.scrollTo({ top: streamCard.offsetTop - 50, behavior: 'smooth' });
+            
+            const netflixCard = document.getElementById('mandate-card-netflix');
+            if (this.phoneScroller && netflixCard) {
+              this.phoneScroller.scrollTo({ top: netflixCard.offsetTop - 50, behavior: 'smooth' });
             }
             await this.wait(500, signal);
             if (signal.aborted) return;
 
-            if (streamCard) {
-              streamCard.classList.add('pulse-glow-pine');
-              this.triggerSimulatedPress(streamCard);
+            if (netflixCard) {
+              netflixCard.classList.add('pulse-glow-coral');
+              this.triggerSimulatedPress(netflixCard);
             }
 
             await this.narration.speak(step.narration, step.duration, signal);
