@@ -181,12 +181,18 @@
       }
     }
 
-    /* Soundwave animation */
+    /* Soundwave animation (paused by default) */
     .soundwave-bar {
       width: 2.5px;
+      height: 4px;
       border-radius: 9999px;
       background: #CBE7DD;
       animation: soundwave-bounce 0.75s ease-in-out infinite alternate;
+      animation-play-state: paused;
+    }
+
+    #soundwave-anim.speaking .soundwave-bar {
+      animation-play-state: running;
     }
     @keyframes soundwave-bounce {
       0% { height: 4px; }
@@ -397,7 +403,7 @@
           <div class="p-2.5 rounded-xl bg-black/40 border border-white/10">
             <div class="flex items-center justify-between pb-1 mb-1 border-b border-white/5">
               <div class="flex items-center gap-1.5">
-                <div class="flex items-end gap-0.5 h-3.5" id="soundwave-anim">
+                <div class="flex items-end gap-0.5 h-3.5 opacity-30 transition-opacity duration-300" id="soundwave-anim">
                   <span class="soundwave-bar"></span>
                   <span class="soundwave-bar"></span>
                   <span class="soundwave-bar"></span>
@@ -454,7 +460,7 @@
               
               <!-- Left: Time + Alert Icon -->
               <div class="flex items-center gap-1.5 text-m3-textPrimary z-10">
-                <span class="font-bold text-[12px] tracking-tight">9:31:39</span>
+                <span id="status-bar-clock" class="font-bold text-[12px] tracking-tight tabular-nums font-mono">9:31:39</span>
                 <svg class="w-3.5 h-3.5 text-emerald-700 ml-0.5" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2Z"/>
                 </svg>
@@ -465,13 +471,12 @@
                 <div class="w-1 h-1 rounded-full bg-[#183350]"></div>
               </div>
 
-              <!-- Right: Speed, VoNR, 5G+, Green Battery Chip -->
+              <!-- Right: VoNR, 5G+, Green Battery Chip -->
               <div class="flex items-center gap-1.5 text-[10px] text-m3-textPrimary z-10">
-                <span class="font-mono text-[8px] text-m3-textSecondary">1.77 KB/s</span>
                 <span class="font-bold text-[9px] text-m3-textSecondary">VoNR</span>
                 <span class="font-extrabold text-[10px] text-m3-textPrimary">5G+</span>
                 <div class="flex items-center px-1.5 py-0.2 rounded-full bg-emerald-500 text-white text-[8px] font-mono font-extrabold ml-0.5">
-                  <span>60%</span>
+                  <span>99</span>
                 </div>
               </div>
             </div>
@@ -527,18 +532,18 @@
                   </button>
                 </div>
 
-                <!-- Centered 3 Metric Tiles (Active 5, Monthly Drain ₹3435, Blocked 15) -->
+                <!-- Centered 3 Metric Tiles (Active 3, Monthly Drain ₹2137, Blocked 15) -->
                 <div class="grid grid-cols-3 gap-2" id="metric-tiles-group">
-                  <!-- Active: 5 -->
+                  <!-- Active: 3 -->
                   <div class="bg-white py-2.5 px-1.5 rounded-[20px] shadow-sm border border-m3-variant flex flex-col items-center justify-center text-center transition-all duration-300 cursor-pointer hover:border-m3-pine/50 active:scale-95" id="tile-active-mandates" onclick="SubZeroShowcase.clickMetricTile('active')">
                     <span class="text-[10.5px] font-medium text-m3-textSecondary">Active</span>
-                    <span class="text-[22px] font-extrabold text-m3-textPrimary mt-0.5 tracking-tight" id="metric-active-count">5</span>
+                    <span class="text-[22px] font-extrabold text-m3-textPrimary mt-0.5 tracking-tight" id="metric-active-count">3</span>
                   </div>
 
-                  <!-- Monthly Drain: ₹3435 -->
+                  <!-- Monthly Drain: ₹2137 -->
                   <div class="bg-white py-2.5 px-1.5 rounded-[20px] shadow-sm border border-m3-variant flex flex-col items-center justify-center text-center transition-all duration-300 cursor-pointer hover:border-m3-pine/50 active:scale-95" id="tile-monthly-drain" onclick="SubZeroShowcase.clickMetricTile('drain')">
                     <span class="text-[10.5px] font-medium text-m3-textSecondary">Monthly Drain</span>
-                    <span class="text-[22px] font-extrabold text-m3-textPrimary mt-0.5 tracking-tight" id="metric-monthly-drain">₹3435</span>
+                    <span class="text-[22px] font-extrabold text-m3-textPrimary mt-0.5 tracking-tight" id="metric-monthly-drain">₹2137</span>
                   </div>
 
                   <!-- Blocked Traps: 15 -->
@@ -566,16 +571,23 @@
                   </div>
                 </div>
 
-                <!-- Connected UPI Apps Carousel (Screenshot 5) -->
+                <!-- Connected UPI Apps (Horizontally Scrollable Carousel) -->
                 <div>
                   <div class="flex items-center justify-between mb-1.5 px-0.5">
                     <h3 class="text-[13px] font-bold text-m3-textPrimary">Connected UPI Apps</h3>
-                    <span class="text-[10.5px] text-m3-textSecondary">Tap to sync</span>
+                    <span class="text-[10px] text-m3-textSecondary flex items-center gap-1">
+                      <span>Scroll</span>
+                      <svg class="w-3 h-3 text-m3-textSecondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                      </svg>
+                    </span>
                   </div>
 
-                  <div class="grid grid-cols-3 gap-2" id="connected-apps-row">
-                    <!-- PhonePe -->
-                    <div class="bg-white p-2.5 rounded-[18px] shadow-sm border border-m3-variant flex flex-col justify-between h-[88px] cursor-pointer hover:border-m3-pine/50 active:scale-95 transition-all" id="app-card-phonepe" onclick="SubZeroShowcase.syncUpiApp('PhonePe')">
+                  <!-- Horizontal Scroll Container: Fits 3 cards in view, scrolls to reveal BHIM UPI -->
+                  <div class="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1 -mx-0.5 px-0.5 scroll-smooth overscroll-x-contain" id="connected-apps-row">
+                    
+                    <!-- 1. PhonePe (Width 94px fits 3 cards perfectly in 298px content width) -->
+                    <div class="w-[94px] min-w-[94px] shrink-0 bg-white p-2.5 rounded-[18px] shadow-sm border border-m3-variant flex flex-col justify-between h-[88px] cursor-pointer hover:border-m3-pine/50 active:scale-95 transition-all" id="app-card-phonepe" onclick="SubZeroShowcase.syncUpiApp('PhonePe')">
                       <div class="flex items-start justify-between">
                         <div class="w-7 h-7 rounded-full bg-[#5F259F] flex items-center justify-center text-white font-bold text-xs shadow-sm">
                           पे
@@ -583,13 +595,13 @@
                         <span class="w-4 h-4 rounded-full bg-m3-pineContainer text-m3-pine text-[9px] font-bold flex items-center justify-center">1</span>
                       </div>
                       <div>
-                        <div class="font-bold text-[12px] text-m3-textPrimary leading-tight">PhonePe</div>
+                        <div class="font-bold text-[12px] text-m3-textPrimary leading-tight truncate">PhonePe</div>
                         <div class="text-[9.5px] text-m3-textSecondary">1 AutoPay</div>
                       </div>
                     </div>
 
-                    <!-- Google Pay -->
-                    <div class="bg-white p-2.5 rounded-[18px] shadow-sm border border-m3-variant flex flex-col justify-between h-[88px] cursor-pointer hover:border-m3-pine/50 active:scale-95 transition-all" id="app-card-gpay" onclick="SubZeroShowcase.syncUpiApp('Google Pay')">
+                    <!-- 2. Google Pay -->
+                    <div class="w-[94px] min-w-[94px] shrink-0 bg-white p-2.5 rounded-[18px] shadow-sm border border-m3-variant flex flex-col justify-between h-[88px] cursor-pointer hover:border-m3-pine/50 active:scale-95 transition-all" id="app-card-gpay" onclick="SubZeroShowcase.syncUpiApp('Google Pay')">
                       <div class="flex items-start justify-between">
                         <div class="w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-sm border border-slate-100 p-1">
                           <svg viewBox="0 0 24 24" class="w-full h-full">
@@ -602,23 +614,38 @@
                         <span class="w-4 h-4 rounded-full bg-m3-pineContainer text-m3-pine text-[9px] font-bold flex items-center justify-center">1</span>
                       </div>
                       <div>
-                        <div class="font-bold text-[12px] text-m3-textPrimary leading-tight">Google Pay</div>
+                        <div class="font-bold text-[12px] text-m3-textPrimary leading-tight truncate">Google Pay</div>
                         <div class="text-[9.5px] text-m3-textSecondary">1 AutoPay</div>
                       </div>
                     </div>
 
-                    <!-- Paytm -->
-                    <div class="bg-white p-2.5 rounded-[18px] shadow-sm border border-m3-variant flex flex-col justify-between h-[88px] cursor-pointer hover:border-m3-pine/50 active:scale-95 transition-all" id="app-card-paytm" onclick="SubZeroShowcase.syncUpiApp('Paytm')">
+                    <!-- 3. Paytm -->
+                    <div class="w-[94px] min-w-[94px] shrink-0 bg-white p-2.5 rounded-[18px] shadow-sm border border-m3-variant flex flex-col justify-between h-[88px] cursor-pointer hover:border-m3-pine/50 active:scale-95 transition-all" id="app-card-paytm" onclick="SubZeroShowcase.syncUpiApp('Paytm')">
                       <div class="flex items-start justify-between">
                         <div class="w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-sm border border-slate-100 p-0.5">
                           <span class="text-[9px] font-extrabold text-[#002970] font-sans">Paytm</span>
                         </div>
                       </div>
                       <div>
-                        <div class="font-bold text-[12px] text-m3-textPrimary leading-tight">Paytm</div>
+                        <div class="font-bold text-[12px] text-m3-textPrimary leading-tight truncate">Paytm</div>
                         <div class="text-[9.5px] text-m3-textSecondary">1 AutoPay</div>
                       </div>
                     </div>
+
+                    <!-- 4. BHIM UPI (Revealed when scrolling sideways) -->
+                    <div class="w-[94px] min-w-[94px] shrink-0 bg-white p-2.5 rounded-[18px] shadow-sm border border-m3-variant flex flex-col justify-between h-[88px] cursor-pointer hover:border-m3-pine/50 active:scale-95 transition-all" id="app-card-bhim" onclick="SubZeroShowcase.syncUpiApp('BHIM UPI')">
+                      <div class="flex items-start justify-between">
+                        <div class="w-7 h-7 rounded-full bg-[#00796B] flex items-center justify-center text-white font-black text-[9px] shadow-sm tracking-tight">
+                          BHIM
+                        </div>
+                        <span class="w-4 h-4 rounded-full bg-m3-pineContainer text-m3-pine text-[9px] font-bold flex items-center justify-center">1</span>
+                      </div>
+                      <div>
+                        <div class="font-bold text-[12px] text-m3-textPrimary leading-tight truncate">BHIM UPI</div>
+                        <div class="text-[9.5px] text-m3-textSecondary">1 AutoPay</div>
+                      </div>
+                    </div>
+
                   </div>
                 </div>
 
@@ -711,7 +738,7 @@
                 <div class="space-y-2 pt-1" id="active-mandates-section">
                   <div class="flex items-center justify-between px-0.5">
                     <h3 class="text-[15px] font-bold text-m3-textPrimary">Active Mandates</h3>
-                    <span class="text-[11px] text-m3-textSecondary font-medium">5 Indexed</span>
+                    <span class="text-[11px] text-m3-textSecondary font-medium" id="label-indexed-count">3 Indexed</span>
                   </div>
 
                   <!-- Mandate Card 1: Spotify (Screenshot 1) -->
@@ -1069,13 +1096,15 @@
           if (iconVolume) {
             iconVolume.innerHTML = '<path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>';
           }
-          if (this.soundwaveAnim) this.soundwaveAnim.style.opacity = '0.2';
+          if (this.soundwaveAnim) {
+            this.soundwaveAnim.classList.remove('speaking');
+            this.soundwaveAnim.style.opacity = '0.3';
+          }
         } else {
           if (textVolume) textVolume.innerText = 'Narration: ON';
           if (iconVolume) {
             iconVolume.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>';
           }
-          if (this.soundwaveAnim) this.soundwaveAnim.style.opacity = '1';
         }
         return this.isMuted;
       }
@@ -1105,7 +1134,8 @@
             }
             this.activeResolve = null;
             if (this.soundwaveAnim) {
-              this.soundwaveAnim.style.opacity = '0.2';
+              this.soundwaveAnim.classList.remove('speaking');
+              this.soundwaveAnim.style.opacity = '0.3';
             }
             resolve();
           };
@@ -1135,14 +1165,19 @@
             }, 80);
           }
 
-          if (this.soundwaveAnim) {
-            this.soundwaveAnim.style.opacity = this.isMuted ? '0.2' : '1';
-          }
-
           if (this.isMuted || !this.synth) {
+            if (this.soundwaveAnim) {
+              this.soundwaveAnim.classList.remove('speaking');
+              this.soundwaveAnim.style.opacity = '0.3';
+            }
             const t = setTimeout(finish, Math.min(expectedDurationMs, 6000));
             this.activeTimeout = t;
             return;
+          }
+
+          if (this.soundwaveAnim) {
+            this.soundwaveAnim.classList.add('speaking');
+            this.soundwaveAnim.style.opacity = '1';
           }
 
           try {
@@ -1187,7 +1222,8 @@
           } catch (e) {}
         }
         if (this.soundwaveAnim) {
-          this.soundwaveAnim.style.opacity = '0.2';
+          this.soundwaveAnim.classList.remove('speaking');
+          this.soundwaveAnim.style.opacity = '0.3';
         }
       }
     }
@@ -1364,6 +1400,7 @@
       }
 
       static openCancelSheet(merchant = 'Spotify') {
+        this.currentCancelMerchant = merchant;
         const backdrop = document.getElementById('modal-cancel-backdrop');
         const title = document.getElementById('cancel-sheet-title');
         const badge = document.getElementById('cancel-sheet-badge');
@@ -1399,6 +1436,17 @@
         if (backdrop) backdrop.classList.remove('open');
       }
 
+      static updateActiveMandatesCount() {
+        const visibleCards = document.querySelectorAll('#active-mandates-section [id^="mandate-card-"]:not(.hidden)');
+        const count = visibleCards.length;
+        
+        const activeCountEl = document.getElementById('metric-active-count');
+        const indexedLabel = document.getElementById('label-indexed-count');
+        
+        if (activeCountEl) activeCountEl.innerText = count.toString();
+        if (indexedLabel) indexedLabel.innerText = `${count} Indexed`;
+      }
+
       static completeRevoke() {
         const btnUpi = document.getElementById('btn-open-upi-app');
         const badge = document.getElementById('cancel-sheet-badge');
@@ -1412,15 +1460,36 @@
             btnUpi.innerHTML = originalText;
             this.closeCancelSheet();
 
+            const merchant = this.currentCancelMerchant || (badge ? badge.innerText : 'Spotify');
+            let cardId = 'mandate-card-spotify';
+            let drainAmount = 139;
+
+            if (merchant.includes('Google') || merchant.includes('StreamVibe')) {
+              cardId = 'mandate-card-streamvibe';
+              drainAmount = 1199;
+            } else if (merchant.includes('Broadband') || merchant.includes('BHIM')) {
+              cardId = 'mandate-card-broadband';
+              drainAmount = 799;
+            }
+
+            const targetCard = document.getElementById(cardId);
+            if (targetCard) {
+              targetCard.classList.add('hidden');
+            }
+
+            SubZeroShowcase.updateActiveMandatesCount();
+
             const activeCounter = document.getElementById('metric-active-count');
-            const drainCounter = document.getElementById('metric-monthly-drain');
-            if (activeCounter && activeCounter.innerText === '5') {
-              activeCounter.innerText = '4';
+            if (activeCounter) {
               activeCounter.classList.add('text-emerald-700', 'scale-110');
               this.safeTimeout(() => activeCounter.classList.remove('scale-110'), 300);
             }
-            if (drainCounter && drainCounter.innerText.includes('3435')) {
-              drainCounter.innerText = '₹3,296';
+
+            const drainCounter = document.getElementById('metric-monthly-drain');
+            if (drainCounter) {
+              const currentVal = parseInt(drainCounter.innerText.replace(/[^0-9]/g, '')) || 2137;
+              const newVal = Math.max(0, currentVal - drainAmount);
+              drainCounter.innerText = `₹${newVal}`;
               drainCounter.classList.add('text-emerald-700', 'scale-110');
               this.safeTimeout(() => drainCounter.classList.remove('scale-110'), 300);
             }
@@ -1437,21 +1506,39 @@
         if (!sw) return;
         const thumb = sw.querySelector('.m3-switch-thumb');
         let enabled = true;
+
         if (thumb) {
           if (thumb.classList.contains('translate-x-4')) {
+            // TURN OFF: Shift to left, switch to neutral track, insert Cross (✕)
             thumb.classList.remove('translate-x-4');
             thumb.classList.add('translate-x-0');
             sw.classList.remove('bg-m3-pine');
             sw.classList.add('bg-slate-300');
+            
+            // Change icon to ✕
+            thumb.innerHTML = `
+              <svg class="w-2.5 h-2.5 stroke-current text-slate-500" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            `;
             enabled = false;
           } else {
+            // TURN ON: Shift to right, switch to Pine track, insert Checkmark (✓)
             thumb.classList.remove('translate-x-0');
             thumb.classList.add('translate-x-4');
             sw.classList.remove('bg-slate-300');
             sw.classList.add('bg-m3-pine');
+            
+            // Change icon to ✓
+            thumb.innerHTML = `
+              <svg class="w-2.5 h-2.5 stroke-current text-m3-pine" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+              </svg>
+            `;
             enabled = true;
           }
         }
+
         const names = {
           'switch-slm': 'Screen Watcher (SLM AI)',
           'switch-daily': 'Start-of-Day Daily Sync',
@@ -1459,11 +1546,16 @@
           'switch-haptic': 'Haptic Alerts'
         };
         const name = names[switchId] || 'Protection Switch';
-        this.showToast(`${name}: ${enabled ? 'Enabled' : 'Disabled'}`, enabled ? '✓' : 'ℹ️');
+        this.showToast(`${name}: ${enabled ? 'Enabled' : 'Disabled'}`, enabled ? '✓' : '✕');
       }
 
       static syncUpiApp(appName) {
-        const idMap = { 'PhonePe': 'app-card-phonepe', 'Google Pay': 'app-card-gpay', 'Paytm': 'app-card-paytm' };
+        const idMap = { 
+          'PhonePe': 'app-card-phonepe', 
+          'Google Pay': 'app-card-gpay', 
+          'Paytm': 'app-card-paytm',
+          'BHIM UPI': 'app-card-bhim'
+        };
         const el = document.getElementById(idMap[appName]);
         if (el) {
           el.classList.add('scale-95', 'border-m3-pine', 'bg-m3-badgeMint/20');
@@ -1479,9 +1571,11 @@
           if (section && scroller) {
             scroller.scrollTo({ top: section.offsetTop - 10, behavior: 'smooth' });
           }
-          this.showToast('5 Active Mandates audited across PhonePe, GPay & BHIM', '📋');
+          const activeCount = document.getElementById('metric-active-count')?.innerText || '3';
+          this.showToast(`${activeCount} Active Mandates audited across PhonePe, GPay & BHIM`, '📋');
         } else if (type === 'drain') {
-          this.showToast('Monthly Drain: ₹3,435 across 5 subscriptions', '💳');
+          const drain = document.getElementById('metric-monthly-drain')?.innerText || '₹2137';
+          this.showToast(`Monthly Drain: ${drain} across active subscriptions`, '💳');
         } else if (type === 'traps') {
           this.showToast('15 Deceptive Traps blocked by SubZero SLM AI', '🛡️');
         }
@@ -1711,6 +1805,12 @@
         this.isPlaying = true;
         this.isPaused = false;
         this.currentStep = fromStep;
+        if (fromStep === 1) {
+          document.querySelectorAll('#active-mandates-section [id^="mandate-card-"]').forEach(c => c.classList.remove('hidden'));
+          SubZeroShowcase.updateActiveMandatesCount();
+          const drain = document.getElementById('metric-monthly-drain');
+          if (drain) drain.innerText = '₹2137';
+        }
         this.updateMasterBtnUI('playing');
         this.startTimerTicker();
 
@@ -1981,7 +2081,30 @@
     }
 
 
+    /**
+     * Real-Time Status Bar Clock
+     * Dynamically updates every second using the client device's local timezone.
+     */
+    function initStatusBarClock() {
+      const clockEl = document.getElementById('status-bar-clock');
+      if (!clockEl) return;
+
+      const updateTime = () => {
+        const now = new Date();
+        // Formats into local time: HH:MM:SS (24-hour or local format with seconds)
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+
+        clockEl.innerText = `${hours}:${minutes}:${seconds}`;
+      };
+
+      updateTime();
+      setInterval(updateTime, 1000);
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+      initStatusBarClock();
       const narrationController = new NarrationController();
       const walkthroughEngine = new WalkthroughEngine(narrationController);
 
